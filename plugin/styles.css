@@ -1,0 +1,51 @@
+/* mod_form styling of nested remote proctor options */
+#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"]>fieldset>div {
+  flex-direction: column;
+  align-items: flex-start !important;
+}
+
+/* simulate col-md styles for form */
+#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"]>fieldset>div>.form-group .col-form-label {
+  flex: 0 0 33%;
+  max-width: 33%;
+  display: block;
+  padding-left: 0;
+}
+
+#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"]>fieldset>div>.form-group [data-fieldtype] {
+  flex: 0 0 66%;
+  max-width: 66%;
+}
+
+#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"]>fieldset>div>.form-group .form-control-feedback {
+  flex: 0 0 100%;
+}
+
+#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"]>fieldset>div>.form-group {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex: 0 0 100%;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+/* view.php attempts table */
+.path-mod-bizexaminer .examattemptssummary .statedetails {
+  display: block;
+  font-size: 0.9em;
+}
+
+.path-mod-bizexaminer table.examattemptresults th.cell {
+  padding: 1px 0.5em 1px 1em;
+  font-weight: bold;
+  text-align: right;
+  width: 10em;
+  background: #f0f0f0;
+}
+
+.path-mod-bizexaminer table.examattemptresults td.cell {
+  padding: 1px 1em 1px 0.5em;
+  text-align: left;
+  background: #fafafa;
+}
