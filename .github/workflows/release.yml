@@ -1,0 +1,42 @@
+name: Build installable plugin zip
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  new-release:
+    name: New release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Variables
+        id: vars
+        run: |
+          PLUGIN_SLUG="bizexaminer"
+          BUILD_DIR="plugin"
+          VERSION_FILE="plugin/version.php"
+          VERSION=$(sed -n "s/.*version = *\([0-9.]*\);/\1/p" $VERSION_FILE)
+          ZIP_FILE="mod_bizexaminer-$VERSION.zip"
+          echo "plugin_slug=$PLUGIN_SLUG" >> $GITHUB_OUTPUT
+          echo "build_dir=$BUILD_DIR" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "zip_file=$ZIP_FILE" >> $GITHUB_OUTPUT
+      - name: Build zip
+        with:
+          build_dir: ${{ steps.vars.outputs.build_dir }}
+          plugin_slug: ${{ steps.vars.outputs.plugin_slug }}
+          zip_file: ${{ steps.vars.outputs.zip_file }}
+        run: |
+          mv "${{ steps.vars.outputs.build_dir }}" "${{ steps.vars.outputs.plugin_slug }}"
+          zip -r "${{ steps.vars.outputs.zip_file }}" "${{ steps.vars.outputs.plugin_slug }}"
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{github.workspace}}/${{ steps.vars.outputs.zip_file }}
+          asset_name: ${{ steps.vars.outputs.zip_file }}
+          asset_content_type: application/zip
