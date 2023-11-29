@@ -26,6 +26,7 @@
 namespace mod_bizexaminer\data_objects;
 
 use DateTime;
+use mod_bizexaminer\api\api_credentials;
 use mod_bizexaminer\api\exam_modules;
 use mod_bizexaminer\api\remote_proctors;
 use mod_bizexaminer\bizexaminer;
@@ -118,6 +119,11 @@ class exam extends data_object {
      * @var null|string
      */
     public ?string $remoteproctortype = null;
+
+    /**
+     * An schemaless array of all configured options for the selected remote proctor.
+     * @var array
+     */
     public array $remoteproctoroptions = [];
 
     /**
@@ -209,6 +215,27 @@ class exam extends data_object {
     public ?int $delayattempt2;
 
     /**
+     * The ID of the api credentials to use.
+     *
+     * @var null|string
+     */
+    public ?string $apicredentials = null;
+
+    public function get_api_credentials(): ?api_credentials {
+        if (!$this->apicredentials) {
+            return null;
+        }
+
+        $credentials = api_credentials::get_by_id($this->apicredentials);
+        if ($credentials) {
+            return $credentials;
+        } else {
+            // Will trigger api exception.
+            return new api_credentials('', '', '', '', '');
+        }
+    }
+
+    /**
      * Build exam module id from id parts.
      *
      * @return string
@@ -218,9 +245,7 @@ class exam extends data_object {
             return null;
         }
 
-        /** @var exam_modules $exammodulesservice */
-        $exammodulesservice = bizexaminer::get_instance()->get_service('exammodules');
-        return $exammodulesservice->build_exam_module_id($this->productid, $this->productpartsid, $this->contentrevision);
+        return exam_modules::build_exam_module_id($this->productid, $this->productpartsid, $this->contentrevision);
     }
 
     /**
@@ -234,7 +259,7 @@ class exam extends data_object {
         }
 
         /** @var remote_proctors $remoteproctorsservice */
-        $remoteproctorsservice = bizexaminer::get_instance()->get_service('remoteproctors');
+        $remoteproctorsservice = bizexaminer::get_instance()->get_service('remoteproctors', $this->get_api_credentials());
         $proctor = $remoteproctorsservice->get_remote_proctor($this->remoteproctor);
         return empty($proctor) ? null : $proctor;
     }
@@ -289,6 +314,8 @@ class exam extends data_object {
         $data->delayattempt1 = $this->delayattempt1;
         $data->delayattempt2 = $this->delayattempt2;
 
+        $data->apicredentials = $this->apicredentials;
+
         return $data;
     }
 
@@ -319,6 +346,8 @@ class exam extends data_object {
         $exam->subnet = $data->subnet;
         $exam->delayattempt1 = $data->delayattempt1;
         $exam->delayattempt2 = $data->delayattempt2;
+
+        $exam->apicredentials = $data->apicredentials;
     }
 
     /**
@@ -368,9 +397,11 @@ class exam extends data_object {
 
     /**
      * Loads the associated feedbacks for this exam and sets it into the instance property.
+     *
      * @param exam $exam
+     * @return void
      */
-    protected static function load_feedbacks(self $exam): void {
+    protected static function load_feedbacks(exam $exam): void {
         if (!$exam->id) {
             return;
         }
@@ -387,9 +418,11 @@ class exam extends data_object {
     /**
      * Loads the associated remote proctor options for this exam and
      * sets it into the instance property.
+     *
      * @param exam $exam
+     * @return void
      */
-    protected static function load_remote_proctor_options(self $exam): void {
+    protected static function load_remote_proctor_options(exam $exam): void {
         /** @var moodle_database $DB */ // phpcs:ignore moodle.Commenting.InlineComment.TypeHintingMatch
         global $DB;
         if (!$exam->id || !$exam->remoteproctor) {
@@ -417,10 +450,10 @@ class exam extends data_object {
      * All proctor options are optional and have a default in the bizExaminer API
      * Therefore no defaults need to be applied.
      *
-     * @param self $exam
+     * @param exam $exam
      * @return bool
      */
-    protected static function save_remote_proctor_options(self $exam): bool {
+    protected static function save_remote_proctor_options(exam $exam): bool {
         /** @var moodle_database $DB */ // phpcs:ignore moodle.Commenting.InlineComment.TypeHintingMatch
         global $DB;
 
@@ -467,10 +500,11 @@ class exam extends data_object {
 
     /**
      * Save feedback messages into their own table.
+     *
      * @param exam $exam
      * @return bool
      */
-    protected static function save_feedbacks(self $exam): bool {
+    protected static function save_feedbacks(exam $exam): bool {
         if (!$exam->id) {
             return false;
         }

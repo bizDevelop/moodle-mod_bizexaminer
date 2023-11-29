@@ -32,6 +32,7 @@ use mod_bizexaminer\data_objects\attempt;
 
 /**
  * Scheduled task to fetch results for a specific attempt.
+ *
  * Scheduled in exams service.
  *
  * @package mod_bizexaminer
@@ -61,7 +62,7 @@ class fetch_results extends \core\task\adhoc_task {
         }
 
         /** @var exams $examsservice */
-        $examsservice = bizexaminer::get_instance()->get_service('exams');
+        $examsservice = bizexaminer::get_instance()->get_service('exams', $attempt->get_exam()->get_api_credentials());
 
         try {
             $examsservice->fetch_results($attempt);

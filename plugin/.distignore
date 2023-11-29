@@ -1,0 +1,13 @@
+.distignore
+/node_modules/
+/tests/
+composer.json
+composer.lock
+vendor
+package.json
+package-lock.json
+phpcs.xml
+phpunit.xml
+phpunit.xml.dist
+phpstan.neon
+webpack.config.js

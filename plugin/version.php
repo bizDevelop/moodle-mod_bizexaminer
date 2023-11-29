@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_bizexaminer';
-$plugin->release = '1.0.1';
-$plugin->version = 2023100501;
+$plugin->release = '1.1.0';
+$plugin->version = 2023112900;
 $plugin->requires = 2023042401;
 $plugin->maturity = MATURITY_STABLE;

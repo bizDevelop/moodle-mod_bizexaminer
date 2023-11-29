@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="MoodleCore">
+	<config name="installed_paths" value="vendor/phpcompatibility/php-compatibility,vendor/squizlabs/php_codesniffer,vendor/phpcsstandards/phpcsutils,vendor/moodlehq/moodle-cs" />
+  <file>./</file>
+  <exclude-pattern type="relative">vendor/*</exclude-pattern>
+  <rule ref="moodle"/>
+</ruleset>

@@ -23,8 +23,8 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_bizexaminer\admin\admin_setting_configdomain;
-use mod_bizexaminer\admin\admin_setting_test_api_button;
+use mod_bizexaminer\admin\admin_setting_api_credentials;
+use mod_bizexaminer\bizexaminer;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,40 +37,13 @@ if ($hassiteconfig) {
     // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
     if ($ADMIN->fulltree) {
         // TODO: maybe define default settings for activity modules (#17).
-        $instance = new admin_setting_configdomain(
-            'mod_bizexaminer/apikeyinstance',
-            new lang_string('apikeyinstance', 'mod_bizexaminer'),
-            new lang_string('apikeyinstance_desc', 'mod_bizexaminer'),
-            ''
-        );
 
-        $settings->add($instance);
-
-        $keyowner = new admin_setting_configpasswordunmask(
-            'mod_bizexaminer/apikeyowner',
-            new lang_string('apikeyowner', 'mod_bizexaminer'),
-            new lang_string('apikeyowner_desc', 'mod_bizexaminer'),
-            ''
-        );
-
-        $settings->add($keyowner);
-
-        $keyorganisation = new admin_setting_configpasswordunmask(
-            'mod_bizexaminer/apikeyorganisation',
-            new lang_string('apikeyorganisation', 'mod_bizexaminer'),
-            new lang_string('apikeyorganisation_desc', 'mod_bizexaminer'),
-            ''
-        );
-
-        $settings->add($keyorganisation);
-
-        $settings->add(new admin_setting_test_api_button(
-            'mod_bizexaminer/testapi',
-            '',
-            ''
-        ));
-
-        // TODO: Allow adding multiple API credentials (#18).
+        // Only register one main setting, name is hardcoded in admin_setting_api_credentials
+        // because it's not a reusable setting type.
+        // Child settings with name_$ID_$FIELD will be created
+        // Moodle will delete all settings from a plugin when a plugin is uninstalled,
+        // so no need to clean up ourselves.
+        $settings->add(new admin_setting_api_credentials());
     }
 
 }

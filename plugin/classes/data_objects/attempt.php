@@ -183,7 +183,7 @@ class attempt extends data_object {
      */
     public function get_exam_url() {
         /** @var exams $examsservice */
-        $examsservice = bizexaminer::get_instance()->get_service('exams');
+        $examsservice = bizexaminer::get_instance()->get_service('exams', $this->get_exam()->get_api_credentials());
         $examurl = $examsservice->get_exam_accessurl($this);
         return $examurl ? new moodle_url($examurl) : false;
     }

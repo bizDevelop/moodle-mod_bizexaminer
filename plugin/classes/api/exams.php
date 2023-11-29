@@ -157,7 +157,7 @@ class exams extends abstract_api_service {
 
         // 1. Validate exam configuration.
         /** @var exam_modules $exammodulesservice */
-        $exammodulesservice = bizexaminer::get_instance()->get_service('exammodules');
+        $exammodulesservice = bizexaminer::get_instance()->get_service('exammodules', $api);
         if (!$exammodulesservice->has_exam_module_content_revision($exam->get_exam_module_id())) {
             throw new bizexaminer_exception('exam_module_invalid', 'mod_bizexaminer');
         }
@@ -310,13 +310,16 @@ class exams extends abstract_api_service {
 
         if ($attempt->hasresults) {
             $results = $attempt->get_results();
-            // Results already exist but somehow status is wrong -> updated id and bail early.
+            // Results already exist but somehow status is wrong
+            // Correct data, return updated id and bail early.
             if ($results) {
                 $attempt->status = attempt::STATUS_COMPLETED;
+                $attempt->hasresults = true;
+                $attempt->timemodified = util::create_date(time());
                 $savedattempt = attempt::save($attempt);
                 return (bool) $savedattempt;
             } else {
-                // Results need to be fetched, but correct hasresults flag.
+                // Results need to be fetched later, but correct hasresults flag here.
                 // Do not save.
                 $attempt->hasresults = false;
             }
@@ -407,6 +410,7 @@ class exams extends abstract_api_service {
      * Deletes all attempts, results and custom grades for a SINGLE user in an exam
      * Does NOT delete grades from gradebook api
      *
+     * @param int $userid
      * @param exam $exam
      * @return bool
      */
@@ -504,6 +508,12 @@ class exams extends abstract_api_service {
         return true;
     }
 
+    /**
+     * Schedules a results check for an attempt, if there is not one scheduled yet.
+     *
+     * @param attempt $attempt
+     * @return void
+     */
     protected function maybe_reschedule_results_check(attempt $attempt) {
         $crontask = fetch_results::instance($attempt->id, $attempt->userid);
 
@@ -511,6 +521,12 @@ class exams extends abstract_api_service {
         \core\task\manager::reschedule_or_queue_adhoc_task($crontask);
     }
 
+    /**
+     * Unschedules a results check for an attempt.
+     *
+     * @param attempt $attempt
+     * @return void
+     */
     protected function unschedule_results_check(attempt $attempt) {
         $crontask = fetch_results::instance($attempt->id, $attempt->userid);
         util::unschedule_adhoc_task($crontask);

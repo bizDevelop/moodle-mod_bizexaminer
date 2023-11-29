@@ -34,7 +34,9 @@ use moodle_exception;
 class bizexaminer_exception extends moodle_exception {
 
     /**
-     * @inheritdoc
+     * Additional debuginfo to output.
+     *
+     * @var string
      */
     public $debuginfo = '';
 

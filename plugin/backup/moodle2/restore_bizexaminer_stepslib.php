@@ -66,6 +66,8 @@ class restore_bizexaminer_activity_structure_step extends restore_activity_struc
         // The dates for timecreated + timemodified are not mapped automatically
         // But probably also makes more sense to keep them at original values.
 
+        // TODO: check api credentials exist.
+
         // Directly save into DB instead of using exam::save
         // because exam::save also saves proctor_options and feedbacks
         // but these are handled in their own functions in this class.

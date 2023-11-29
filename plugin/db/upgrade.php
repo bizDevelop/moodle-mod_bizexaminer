@@ -40,6 +40,7 @@ function xmldb_bizexaminer_upgrade($oldversion) {
     // You will also have to create the db/install.xml file by using the XMLDB Editor.
     // Documentation for the XMLDB Editor can be found at {@link https://docs.moodle.org/dev/XMLDB_editor}.
 
+    // Fix id/index for grades.
     if ($oldversion < 2023100403) {
 
         // Define field id to be added to bizexaminer_grades.
@@ -55,6 +56,42 @@ function xmldb_bizexaminer_upgrade($oldversion) {
 
         // Bizexaminer savepoint reached.
         upgrade_mod_savepoint(true, 2023100403, 'bizexaminer');
+    }
+
+    // Multiple API Keys update.
+    if ($oldversion < 2023110200) {
+        // Define field api_credentials to be added to bizexaminer.
+        $table = new xmldb_table('bizexaminer');
+        $field = new xmldb_field('apicredentials', XMLDB_TYPE_CHAR, '15', null, null, null, null, 'usebecertificate');
+
+        // Conditionally launch add field api_credentials.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $oldapiinstance = get_config('mod_bizexaminer', 'apikeyinstance');
+        $oldapikeyorganisation = get_config('mod_bizexaminer', 'apikeyorganisation');
+        $oldapikeyowner = get_config('mod_bizexaminer', 'apikeyowner');
+
+        if (!empty($oldapiinstance) || !empty($oldapikeyorganisation) || !empty($oldapikeyowner)) {
+            $newapicredentialsid = uniqid();
+            set_config('apicredentials_' . $newapicredentialsid . '_name', 'Main', 'mod_bizexaminer');
+            set_config('apicredentials_' . $newapicredentialsid . '_instance', $oldapiinstance, 'mod_bizexaminer');
+            set_config('apicredentials_' . $newapicredentialsid . '_keyorganisation', $oldapikeyorganisation, 'mod_bizexaminer');
+            set_config('apicredentials_' . $newapicredentialsid . '_keyowner', $oldapikeyowner, 'mod_bizexaminer');
+
+            set_config('apicredentials', $newapicredentialsid, 'mod_bizexaminer');
+
+            unset_config('apikeyinstance', 'mod_bizexaminer');
+            unset_config('apikeyorganisation', 'mod_bizexaminer');
+            unset_config('apikeyowner', 'mod_bizexaminer');
+
+            // Set new API Credentials ID for all existing exams.
+            $DB->set_field('bizexaminer', 'apicredentials', $newapicredentialsid);
+        }
+
+        // Bizexaminer savepoint reached.
+        upgrade_mod_savepoint(true, 2023110200, 'bizexaminer');
     }
 
     return true;

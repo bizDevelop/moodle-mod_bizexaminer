@@ -32,6 +32,7 @@ use mod_bizexaminer\api\exams;
 use mod_bizexaminer\api\remote_proctors;
 use mod_bizexaminer\callback_api\callback_api;
 use mod_bizexaminer\gradebook\grading;
+use mod_bizexaminer\settings;
 
 /**
  * The main plugin class which also acts as a DI-container for services.
@@ -78,7 +79,7 @@ class bizexaminer {
     public function __construct() {
         $this->container = [];
 
-        $this->init_api();
+        $this->init_container();
         $this->init_services();
     }
 
@@ -99,10 +100,10 @@ class bizexaminer {
      * Get an initialized service from the container.
      *
      * @param string $key
+     * @param array ...$args Other args passed to the service definition function
      * @return mixed
-     * @throws coding_exception
      */
-    public function get_service(string $key) {
+    public function get_service(string $key, ...$args) {
         $servicedefinition = $this->get($key);
         if (!$servicedefinition) {
             throw new coding_exception('service ' . $key . ' is not defined in bizExaminer.');
@@ -111,7 +112,7 @@ class bizexaminer {
         // Create instance if not already exists.
         if (!array_key_exists($key, $this->services)) {
             if (is_callable($servicedefinition)) {
-                $this->services[$key] = $servicedefinition($this);
+                $this->services[$key] = $servicedefinition($this, ...$args);
             }
         }
 
@@ -133,40 +134,40 @@ class bizexaminer {
     }
 
     /**
-     * Initialize the API.
+     * Initialize the container.
      */
-    protected function init_api() {
-        $instance = get_config('mod_bizexaminer', 'apikeyinstance');
-        $keyowner = get_config('mod_bizexaminer', 'apikeyowner');
-        $keyorganisation = get_config('mod_bizexaminer', 'apikeyorganisation');
-
-        $this->container['api.instance'] = $instance;
-        $this->container['api.keyowner'] = $keyowner;
-        $this->container['api.keyorganisation'] = $keyorganisation;
+    protected function init_container() {
+        // Factory method for building an API client.
+        $this->container['api'] = function($apicredentialsorclient): api_client {
+            $apiclient = null;
+            if ($apicredentialsorclient instanceof api_client) {
+                $apiclient = $apicredentialsorclient;
+            } else if ($apicredentialsorclient instanceof api_credentials) {
+                $apiclient = $apicredentialsorclient->get_api_client();
+            }
+            if (!$apiclient) {
+                throw new \InvalidArgumentException(
+                    '$apicredentialsorclient has to be an instance of api_client or api_credentials.');
+            }
+            return $apiclient;
+        };
     }
 
     /**
-     * Initialize all services.
+     * Initialize all services definitions (=singletons).
      */
     protected function init_services() {
-        $this->container['api'] = function($plugin) {
-            $credentials = new api_credentials(
-                $plugin->get('api.instance'), $plugin->get('api.keyowner'), $plugin->get('api.keyorganisation')
-            );
-            $apiclient = new api_client($credentials);
-            return $apiclient;
-        };
         $this->container['settings'] = function(bizexaminer $plugin) {
-            return new settings($plugin->get_service('api'));
+            return new settings();
         };
-        $this->container['exammodules'] = function(bizexaminer $plugin) {
-            return new exam_modules($plugin->get_service('api'));
+        $this->container['exammodules'] = function(bizexaminer $plugin, $apicredentialsorclient) {
+            return new exam_modules($plugin->get('api')($apicredentialsorclient));
         };
-        $this->container['remoteproctors'] = function(bizexaminer $plugin) {
-            return new remote_proctors($plugin->get_service('api'));
+        $this->container['remoteproctors'] = function(bizexaminer $plugin, $apicredentialsorclient) {
+            return new remote_proctors($plugin->get('api')($apicredentialsorclient));
         };
-        $this->container['exams'] = function(bizexaminer $plugin) {
-            return new exams($plugin->get_service('api'));
+        $this->container['exams'] = function(bizexaminer $plugin, $apicredentialsorclient) {
+            return new exams($plugin->get('api')($apicredentialsorclient));
         };
         $this->container['callbackapi'] = function(bizexaminer $plugin) {
             return new callback_api();

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/bizexaminer/db" VERSION="20231004" COMMENT="XMLDB file for Moodle mod_bizexaminer"
+<XMLDB PATH="mod/bizexaminer/db" VERSION="20231027" COMMENT="XMLDB file for Moodle mod_bizexaminer"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -30,6 +30,7 @@
         <FIELD NAME="overduehandling" TYPE="char" LENGTH="16" NOTNULL="false" DEFAULT="cancel" SEQUENCE="false" COMMENT="The method used to handle overdue attempts. 'graceperiod' or 'cancel'."/>
         <FIELD NAME="graceperiod" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The amount of time (in seconds) after the time limit runs out during which attempts can still be submitted, if overduehandling is set to allow it."/>
         <FIELD NAME="usebecertificate" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to use bizExaminer certificates."/>
+        <FIELD NAME="apicredentials" TYPE="char" LENGTH="15" NOTNULL="false" SEQUENCE="false" COMMENT="UID of the api credentials set to use."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

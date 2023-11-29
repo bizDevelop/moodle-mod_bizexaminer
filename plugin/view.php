@@ -135,7 +135,7 @@ if ($haspendingattempt) {
 // The limit of max attempts is important - which is checked in can_access.
 if ($canattempt) {
     /** @var exams $examsservice */
-    $examsservice = bizexaminer::get_instance()->get_service('exams');
+    $examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
     $canaccess = $examsservice->can_access($exam, $USER->id);
 
     if ($canaccess !== true) {

@@ -83,6 +83,7 @@ class remote_proctors extends abstract_api_service {
 
     /**
      * Gets a remote proctor based on its unique id.
+     *
      * @param string $id
      * @return array|false
      */
@@ -97,7 +98,7 @@ class remote_proctors extends abstract_api_service {
     /**
      * Returns a readable name for a proctor type
      *
-     * @param string|null $proctorType
+     * @param string|null $proctortype
      * @return string
      */
     public function map_proctor_type_label(?string $proctortype) {

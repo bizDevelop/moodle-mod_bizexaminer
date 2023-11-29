@@ -53,7 +53,7 @@ class renderer extends plugin_renderer_base {
      * Displays a list of all exams in a course.
      *
      * @param stdClass $course
-     * @param stdClass $exam from get_all_instances_in_courses
+     * @param stdClass[] $exams from get_all_instances_in_courses
      * @return string
      */
     public function exams_list($course, array $exams): string {
@@ -215,8 +215,9 @@ class renderer extends plugin_renderer_base {
     /**
      * Displays the results of an exam attempt
      *
+     * @param exam $exam
      * @param attempt $attempt
-     * @param attempt_results $results
+     * @param attempt_results|null $results
      * @return string
      */
     public function attempt_details(exam $exam, attempt $attempt, ?attempt_results $results): string {
@@ -608,7 +609,7 @@ class renderer extends plugin_renderer_base {
         /** @var callback_api $callbackapi */
         $callbackapi = bizexaminer::get_instance()->get_service('callbackapi');
         /** @var exams $examsservice */
-        $examsservice = bizexaminer::get_instance()->get_service('exams');
+        $examsservice = bizexaminer::get_instance()->get_service('exams', $attempt->get_exam()->get_api_credentials());
         $exam = $attempt->get_exam();
 
         $actions = [];

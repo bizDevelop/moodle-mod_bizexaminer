@@ -28,7 +28,8 @@ namespace mod_bizexaminer\task;
 use cache;
 
 /**
- * Adhoc task to clear/purge the exam modules fetched from api
+ * Adhoc task to clear/purge the exam modules fetched from api.
+ *
  * Will be scheduled for a short amount of time in the future after getting the exam modules
  * because the cache ttl flag shouldnt be used
  * see https://docs.moodle.org/dev/Cache_AP

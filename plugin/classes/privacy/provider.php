@@ -208,7 +208,7 @@ class provider implements
             return;
         }
         /** @var exams $examsservice */
-        $examsservice = bizexaminer::get_instance()->get_service('exams');
+        $examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
 
         // Delete attempts, results, grades, gradebook api.
         // This does NOT deletes gradebook grades as well, guess moodle core handles that?
@@ -222,8 +222,6 @@ class provider implements
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        $examsservice = bizexaminer::get_instance()->get_service('exams');
-
         foreach ($contextlist as $context) {
             if ($context->contextlevel != CONTEXT_MODULE) {
                 // Only activity module will be handled.
@@ -243,6 +241,8 @@ class provider implements
             }
             $user = $contextlist->get_user();
 
+            $examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
+
             // Delete attempts, results, grades.
             // This does NOT deletes gradebook grades as well, guess moodle core handles that?
             $examsservice->delete_user_attempts($user->id, $exam);
@@ -256,8 +256,6 @@ class provider implements
      * @param approved_userlist $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-        $examsservice = bizexaminer::get_instance()->get_service('exams');
-
         $context = $userlist->get_context();
 
         if ($context->contextlevel != CONTEXT_MODULE) {
@@ -276,6 +274,8 @@ class provider implements
             return;
         }
         $userids = $userlist->get_userids();
+
+        $examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
 
         foreach ($userids as $userid) {
             // Delete attempts, results, grades.

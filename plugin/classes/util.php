@@ -43,7 +43,7 @@ abstract class util {
     /**
      * Gets the current context module context
      *
-     * @param null|stdClass|cm_info $coursemodule @see get_coursemodule
+     * @param null|stdClass|cm_info $coursemodule {@see get_coursemodule}
      * @return null|context_module
      */
     public static function get_cm_context($coursemodule): ?context_module {
@@ -116,6 +116,8 @@ abstract class util {
      * Returns detailed information about specified exception.
      *
      * @param Throwable $exception any sort of exception or throwable.
+     * @param string $level The level on which to log the exception. Any of moodles DEBUG_* levels
+     * @return void
      */
     public static function log_exception(Throwable $exception, string $level = DEBUG_NORMAL): void {
         // Taken form default_exception_handler.

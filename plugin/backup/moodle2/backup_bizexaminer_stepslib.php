@@ -37,6 +37,7 @@ class backup_bizexaminer_activity_structure_step extends backup_questions_activi
             'remoteproctor', 'remoteproctortype', 'maxattempts', 'grademethod',
             'grade', 'password', 'subnet', 'delayattempt1', 'delayattempt2',
             'timeopen', 'timeclose', 'overduehandling', 'graceperiod', 'usebecertificate',
+            'apicredentials'
         ]);
 
         $proctoroptions = new backup_nested_element('proctor_options');

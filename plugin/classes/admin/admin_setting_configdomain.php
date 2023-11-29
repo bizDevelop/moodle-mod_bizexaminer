@@ -50,14 +50,20 @@ class admin_setting_configdomain extends \admin_setting_configtext {
             return true;
         }
 
+        $valid = false;
+
             // Validate each string entry against the supported formats.
         if (\core\ip_utils::is_ip_address($data) || \core\ip_utils::is_ipv6_range($data)
                     || \core\ip_utils::is_ipv4_range($data) || \core\ip_utils::is_domain_name($data)
                     || \core\ip_utils::is_domain_matching_pattern($data)) {
-                    return true;
-        } else {
-            return get_string('validateerrorlist', 'admin', $data);
+                    $valid = true;
+            // Test if PHP can get an IP from a domain.
+            if (!filter_var(gethostbyname($data), FILTER_VALIDATE_IP )) {
+                $valid = false;
+            }
         }
+
+        return $valid ? true : get_string('validateerrorlist', 'admin', $data);
 
     }
 }

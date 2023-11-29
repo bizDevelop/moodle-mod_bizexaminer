@@ -27,11 +27,13 @@ namespace mod_bizexaminer\check;
 
 use core\check\check;
 use core\check\result;
+use html_writer;
 use mod_bizexaminer\bizexaminer;
 use mod_bizexaminer\settings;
 
 /**
  * Check which tests if the configured API credentials are valid.
+ *
  * Executed/checked in the moodle checks user interface.
  *
  * @package mod_bizexaminer
@@ -57,16 +59,25 @@ class testapi extends check {
     public function get_result(): result {
         /** @var settings $settingsservice */
         $settingsservice = bizexaminer::get_instance()->get_service('settings');
-        $testresult = $settingsservice->test_settings();
+        $testresults = $settingsservice->test_settings();
 
-        if ($testresult) {
-            $status = result::OK;
-            $summary = get_string('testapi_success', 'mod_bizexaminer');
-        } else {
+        $haserrors = !empty(array_filter($testresults, function($result) {
+            return !$result['result'];
+        }));
+
+        if ($haserrors) {
             $status = result::ERROR;
             $summary = get_string('testapi_error', 'mod_bizexaminer');
+        } else {
+            $status = result::OK;
+            $summary = get_string('testapi_success', 'mod_bizexaminer');
         }
-        $details = get_string('testapi_desc', 'mod_bizexaminer');
+        $details = html_writer::alist(array_map(function($result) {
+            return s($result['credentials']->get_name()) . ': ' .
+            ($result['result'] ?
+                get_string('testapi_credentials_valid', 'mod_bizexaminer') :
+                get_string('testapi_credentials_invalid', 'mod_bizexaminer'));
+        }, $testresults));
         return new result($status, $summary, $details);
     }
 }

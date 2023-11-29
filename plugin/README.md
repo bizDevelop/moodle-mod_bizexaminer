@@ -122,6 +122,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Changelog ##
 
+### 1.1.0 (2023-11-29) ###
+- New: Add option to configure multiple API credentials
+- Tweak: Re-Add German translations for easier testing before plugin is live in Moodle repository
+- Code Quality: Apply coding standards from Moodle plugin repository
+- Dev: Add GitHub release action workflow
+
 ### 1.0.1 (2023-10-05) ###
 - Fix phpcs warnings/issues from moodle repository.
 

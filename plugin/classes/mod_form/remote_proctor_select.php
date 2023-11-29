@@ -29,11 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/form/autocomplete.php');
 
-use coding_exception;
-use dml_exception;
+use mod_bizexaminer\api\api_credentials;
 use mod_bizexaminer\api\remote_proctors;
 use mod_bizexaminer\bizexaminer;
-use moodle_exception;
 
 /**
  * Form field type for choosing a remote proctor.
@@ -49,19 +47,31 @@ class remote_proctor_select extends \MoodleQuickForm_select {
      */
     private static bool $fetchoptionserroradded = false;
 
+    /**
+     * The api credentials selected for this exam.
+     * If none are selected, no exam modules will be fetched.
+     * If they are selected, those are used to fetch exam modules.
+     *
+     * @var null|api_credentials
+     */
+    private ?api_credentials $apicredentials = null;
+
      /**
       * Constructor
       *
-      * @param string $elementName Select name attribute
-      * @param mixed $elementLabel Label(s) for the select
+      * @param string $elementname Select name attribute
+      * @param mixed $elementlabel Label(s) for the select
       * @param mixed $attributes Either a typical HTML attribute string or an associative array
+      * @param api_credentials|null $apicredentials API Credentials used to fetch remote proctors
       */
-    public function __construct($elementname = null, $elementlabel = null, $attributes = null) {
+    public function __construct(
+        $elementname = null, $elementlabel = null, $attributes = null, ?api_credentials $apicredentials = null) {
+        $this->apicredentials = $apicredentials;
         // This comment is from the MoodleQuickForm_autocomplete class (sic!):
         // Even if the constructor gets called twice we do not really want 2x options (crazy forms!).
         $this->_options = [];
         parent::__construct($elementname, $elementlabel, [], $attributes, true);
-        $this->loadArray(self::get_remote_proctors());
+        $this->loadArray($this->get_remote_proctors());
     }
 
     /**
@@ -69,14 +79,18 @@ class remote_proctor_select extends \MoodleQuickForm_select {
      *
      * @return string[]
      */
-    public static function get_remote_proctors(): array {
-        /** @var remote_proctors $remoteproctorsservice */
-        $remoteproctorsservice = bizexaminer::get_instance()->get_service('remoteproctors');
-        $remoteproctors = $remoteproctorsservice->get_remote_proctors();
-
+    public function get_remote_proctors(): array {
         $options = [
             '' => get_string('choosedots'),
         ];
+
+        if (!$this->apicredentials) {
+            return $options;
+        }
+
+        /** @var remote_proctors $remoteproctorsservice */
+        $remoteproctorsservice = bizexaminer::get_instance()->get_service('remoteproctors', $this->apicredentials);
+        $remoteproctors = $remoteproctorsservice->get_remote_proctors();
 
         foreach ($remoteproctors as $id => $proctor) {
             $name = $proctor['name'];
@@ -125,11 +139,14 @@ class remote_proctor_select extends \MoodleQuickForm_select {
      * @param string $value Submitted value.
      * @return string|null Validation error message or null.
      */
-    // phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod
-    public function validateSubmitValue($value) {
+    public function validateSubmitValue($value) { // phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod
+        if (!$this->apicredentials) {
+            return get_string('modform_remote_proctor_invalid', 'mod_bizexaminer');
+        }
+
         if (!empty($value)) {
             /** @var remote_proctors $remoteproctorsservice */
-            $remoteproctorsservice = bizexaminer::get_instance()->get_service('remoteproctors');
+            $remoteproctorsservice = bizexaminer::get_instance()->get_service('remoteproctors', $this->apicredentials);
             if (str_contains($value, '_-_')) {
                 // Frontend stores it with {$proctorType}_-_{$proctorAccountName} for conditional hiding/displaying.
                 $value = substr($value, strpos($value, '_-_') + 3);

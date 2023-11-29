@@ -24,6 +24,7 @@
  */
 
 use core_grades\component_gradeitems;
+use mod_bizexaminer\api\api_credentials;
 use mod_bizexaminer\api\remote_proctors;
 use mod_bizexaminer\bizexaminer;
 use mod_bizexaminer\data_objects\exam;
@@ -37,7 +38,7 @@ use mod_bizexaminer\mod_form\remote_proctor_select;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
-bizexaminer::get_instance()->get_service('settings')->check_credentials();
+bizexaminer::get_instance()->get_service('settings')->check_has_credentials();
 
 /**
  * Module instance settings form.
@@ -53,15 +54,41 @@ bizexaminer::get_instance()->get_service('settings')->check_credentials();
  */
 class mod_bizexaminer_mod_form extends moodleform_mod {
 
+    /**
+     * The maximum value for "max attempts" setting.
+     */
     private const MAX_ATTEMPT_OPTION = 10;
 
+    /**
+     * A service for generating options, processing and validating, communicating with datalayer.
+     *
+     * @var mod_form_helper
+     */
     private mod_form_helper $modformhelper;
 
+    /**
+     * Cache feedbacks.
+     *
+     * @var null|array
+     */
     private ?array $feedbacks = null;
 
+    /**
+     * The currently edited or created exam instance.
+     * @var null|exam
+     */
+    private ?exam $exam = null;
+
     public function __construct($current, $section, $cm, $course) {
-        parent::__construct($current, $section, $cm, $course);
         $this->modformhelper = new mod_form_helper();
+        $this->exam = new exam();
+        if (!empty($cm->instance)) {
+            $exam = exam::get((int)$cm->instance);
+            if ($exam) {
+                $this->exam = $exam;
+            }
+        }
+        parent::__construct($current, $section, $cm, $course);
     }
     /**
      * Defines forms elements
@@ -103,21 +130,79 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
         // BizExaminer Settings.
         $mform->addElement('header', 'bizexaminer', get_string('pluginname', 'mod_bizexaminer'));
 
-        $mform->addElement('bizexaminer_exam_modules_select', 'exam_module', get_string('modform_exam_module', 'mod_bizexaminer'));
+        $credentialsoptions = [
+            '' => get_string('choosedots'),
+        ];
+        foreach (api_credentials::get_all() as $set) {
+            $credentialsoptions[$set->get_id()] = $set->get_name();
+        }
+        $mform->addElement('select', 'api_credentials',
+            get_string('modform_api_credentials', 'mod_bizexaminer'), $credentialsoptions);
+        $mform->addHelpButton('api_credentials', 'modform_api_credentials', 'mod_bizexaminer');
+        // Select field type checks for allowed options by default; additionally require a value.
+        $mform->addRule('api_credentials', null, 'required', null, 'client');
+
+        // When the save_api_credentials submit form is clicked,
+        // We try to get the submitted api credentials and set them in the exam instance in this class.
+        // So it can be used below to show api-dependent fields.
+        $savedapicredentials = $this->optional_param('save_api_credentials', '', PARAM_TEXT);
+        $submittedapicredentials = $this->optional_param('api_credentials', '', PARAM_RAW);
+        if (!empty($savedapicredentials)) {
+            // Test if those api credentials exist, if not just don't select them.
+            if (api_credentials::get_by_id($submittedapicredentials)) {
+                $this->exam->apicredentials = $submittedapicredentials;
+            }
+        }
+
+        // Allways show the user a button to click when the API credentials are changed.
+        // To disable the api-dependent fields, they are disabledIf different than the previous chosen api credentials.
+        $mform->addElement('static', 'save_api_credentials_description', '',
+            get_string('modform_api_credentials_save_help', 'mod_bizexaminer'));
+        $mform->registerNoSubmitButton('save_api_credentials'); // Do not trigger saving of form. Must be before adding field.
+        $mform->addElement('submit', 'save_api_credentials',
+            get_string('modform_api_credentials_save', 'mod_bizexaminer'), [], false);
+        $mform->disabledIf('save_api_credentials', 'api_credentials', 'noitemselected');
+        $mform->disabledIf('save_api_credentials', 'api_credentials', 'eq', '');
+        if ($this->exam->apicredentials) {
+            // Disable button, if api credentials value is not changed.
+            $mform->disabledIf('save_api_credentials', 'api_credentials', 'eq', $this->exam->apicredentials);
+        }
+
+        // Other fiels should only be shown if any credentials (even invalid) are selected.
+        if (!$this->exam->apicredentials) {
+            return;
+        }
+
+        $mform->addElement(new exam_modules_select(
+                'exam_module', get_string('modform_exam_module', 'mod_bizexaminer'), [],
+                $this->exam->get_api_credentials()
+        ));
         $mform->addHelpButton('exam_module', 'modform_exam_module', 'mod_bizexaminer');
         // Select field type checks for allowed options by default; additionally require a value.
         $mform->addRule('exam_module', null, 'required', null, 'client');
+        $mform->disabledIf('exam_module', 'api_credentials', 'noitemselected');
+        $mform->disabledIf('exam_module', 'api_credentials', 'eq', '');
 
         $mform->addElement('selectyesno', 'usebecertificate', get_string('modform_usebecertificate', 'mod_bizexaminer'));
         $mform->addHelpButton('usebecertificate', 'modform_usebecertificate', 'mod_bizexaminer');
+        $mform->disabledIf('usebecertificate', 'api_credentials', 'noitemselected');
+        $mform->disabledIf('usebecertificate', 'api_credentials', 'eq', '');
 
-        // Select field type checks for allowed options by default; no value is required.
-        $mform->addElement(
-            'bizexaminer_remote_proctor_select',
-            'remote_proctor',
-            get_string('modform_remote_proctor', 'mod_bizexaminer')
-        );
+        $mform->addElement(new remote_proctor_select(
+            'remote_proctor', get_string('modform_remote_proctor', 'mod_bizexaminer'), [],
+            $this->exam->get_api_credentials()
+        ));
         $mform->addHelpButton('remote_proctor', 'modform_remote_proctor', 'mod_bizexaminer');
+        $mform->disabledIf('remote_proctor', 'api_credentials', 'noitemselected');
+        $mform->disabledIf('remote_proctor', 'api_credentials', 'eq', '');
+
+        // Disable api-dependent fields if different api credentials than previously selected are chosen.
+        // Use has to submit save_api_credentials button first.
+        if ($this->exam->apicredentials) {
+            $mform->disabledIf('exam_module', 'api_credentials', 'neq', $this->exam->apicredentials);
+            $mform->disabledIf('usebecertificate', 'api_credentials', 'neq', $this->exam->apicredentials);
+            $mform->disabledIf('remote_proctor', 'api_credentials', 'neq', $this->exam->apicredentials);
+        }
 
         $this->add_remote_proctor_fields();
     }
@@ -125,7 +210,11 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
     private function add_remote_proctor_fields() {
         $mform = $this->_form;
 
-        $remoteproctoroptions = remote_proctor_select::get_remote_proctors();
+        if (!$this->exam) {
+            return;
+        }
+
+        $remoteproctoroptions = $mform->getElement('remote_proctor')->get_remote_proctors();
 
         foreach (remote_proctors::get_remote_proctor_setting_fields() as $proctor => $proctorfields) {
             $groupname = "remote_proctor_options[{$proctor}]";
@@ -326,6 +415,12 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
             if (strlen($data['exam_password']) < 4 || strlen($data['exam_password']) > 12) {
                 $errors['exam_password'] = get_string('modform_access_restrictions_password_error_length', 'mod_bizexaminer');
             }
+        }
+
+        // Check if api credentials exist.
+        $apicredentials = api_credentials::get_by_id($data['api_credentials'] ?? '');
+        if (!$apicredentials || !$apicredentials->test_credentials()) {
+            $errors['api_credentials'] = get_string('modform_api_credentials_invalid', 'mod_bizexaminer');
         }
 
         $this->modformhelper->validate_feedbacks($data, $errors);

@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
+ * Define capabilities.
  *
  * @package     mod_bizexaminer
  * @category    db

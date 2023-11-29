@@ -32,6 +32,7 @@ use mod_bizexaminer\util;
 
 /**
  * A base HTTP implementation of an API Client
+ *
  * Works with GuzzleHTTP moodle 4.2
  * @link https://docs.google.com/document/d/1UvvQJOhBZ6d2SpPSz5U5SL6dULwgdW1dnVSXwrDaODQ
  */
@@ -121,18 +122,18 @@ class api_client {
     /**
      * Calls createBooking to book an exam
      *
-     * @param string $examModule
-     * @param string $contentRevisionId
-     * @param string $participantId
-     * @param string $returnUrl
-     * @param string $callbackUrl
-     * @param string|null $remoteProctor
-     * @param array $remoteProctorSettings default: []
-     * @param string $uiLanguage
-     * @param DateTime|null $startDate
-     * @param DateTime|null $endDate
+     * @param string $exammodule
+     * @param string $contentrevisionid
+     * @param string $participantid
+     * @param string $returnurl
+     * @param string $callbackurl
+     * @param string|null $remoteproctor
+     * @param array $remoteproctorsettings default: []
+     * @param string $uilanguage
+     * @param DateTime|null $startdate
+     * @param DateTime|null $enddate
      * @param string|null $accesscode
-     * @return array|false bookingData (array):
+     * @return array|false bookingdata (array):
      *                        'bookingId' => (int) the exam booking id
      *                        'url' => (string) the url to start the exam
      */
@@ -202,8 +203,8 @@ class api_client {
     /**
      * Gets the direct exam access url for a booking.
      *
-     * @param int $bookingId
-     * @param string $uiLanguage
+     * @param int $bookingid
+     * @param string $uilanguage
      * @return string|false directAccessExamUrl on success, false on error
      */
     public function get_examination_accessurl(int $bookingid, string $uilanguage = '') {
@@ -256,7 +257,7 @@ class api_client {
     /**
      * Calls checkParticipant to check for an existing participant based on the search data
      *
-     * @param array $searchData Search for a participant with the following data
+     * @param array $searchdata Search for a participant with the following data
      *              'id'|'participantID' => (string)
      *              'email' => (string)
      *              'firstName' => (string)
@@ -294,8 +295,8 @@ class api_client {
     /**
      * Calls getParticipantOverview to get the results for a participant in a booking
      *
-     * @param string $participantId
-     * @param string $bookingId
+     * @param string $participantid
+     * @param string $bookingid
      * @return array array of results (see docs)
      */
     public function get_participant_overview(string $participantid, string $bookingid): array {
@@ -317,8 +318,8 @@ class api_client {
     /**
      * Calls getParticipantOverviewWithDetailsAndContent to get the results including content details
      *
-     * @param string $participantId
-     * @param string $bookingId
+     * @param string $participantid
+     * @param string $bookingid
      * @return array array of results (see docs)
      */
     public function get_participant_overview_with_details(string $participantid, string $bookingid): array {

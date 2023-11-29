@@ -1,0 +1,27 @@
+{
+  "name": "bizexaminer/moodle-plugin",
+  "description": "An activity module plugin for moodle to connect with bizExaminer",
+  "type": "moodle-plugin",
+  "license": "GPLv3 or later",
+  "authors": [
+    {
+      "name": "Fabian Todt",
+      "email": "mail@fabiantodt.at"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "scripts": {
+    "phpcs": "vendor/bin/phpcs",
+    "phpcs:fix": "vendor/bin/phpcbf",
+    "lint": "find . -name '*.php' -not -path './vendor/*' -exec php -l '{}' \\;"
+  },
+  "minimum-stability": "dev",
+  "require-dev": {
+    "moodlehq/moodle-cs": "dev-main",
+    "squizlabs/php_codesniffer": "3.*"
+  }
+}

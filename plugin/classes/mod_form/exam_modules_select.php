@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/form/selectgroups.php');
 
+use mod_bizexaminer\api\api_credentials;
 use mod_bizexaminer\api\exam_modules;
 use mod_bizexaminer\bizexaminer;
 
@@ -47,19 +48,31 @@ class exam_modules_select extends \MoodleQuickForm_selectgroups {
      */
     private static bool $fetchoptionserroradded = false;
 
+    /**
+     * The api credentials selected for this exam.
+     * If none are selected, no exam modules will be fetched.
+     * If they are selected, those are used to fetch exam modules.
+     *
+     * @var null|api_credentials
+     */
+    private ?api_credentials $apicredentials = null;
+
      /**
       * Constructor
       *
-      * @param string $elementName Select name attribute
-      * @param mixed $elementLabel Label(s) for the select
+      * @param string $elementname Select name attribute
+      * @param mixed $elementlabel Label(s) for the select
       * @param mixed $attributes Either a typical HTML attribute string or an associative array
+      * @param api_credentials|null $apicredentials API Credentials used to fetch exam modules
       */
-    public function __construct($elementname = null, $elementlabel = null, $attributes = null) {
+    public function __construct(
+        $elementname = null, $elementlabel = null, $attributes = null, ?api_credentials $apicredentials = null) {
+        $this->apicredentials = $apicredentials;
         // This comment is from the MoodleQuickForm_autocomplete class (sic!).
         // Even if the constructor gets called twice we do not really want 2x options (crazy forms!).
         $this->_optGroups = [];
         parent::__construct($elementname, $elementlabel, [], $attributes, false);
-        $this->loadArrayOptGroups(self::get_exam_modules());
+        $this->loadArrayOptGroups($this->get_exam_modules());
     }
 
     /**
@@ -67,16 +80,20 @@ class exam_modules_select extends \MoodleQuickForm_selectgroups {
      *
      * @return array
      */
-    private static function get_exam_modules(): array {
-        /** @var exam_modules $exammodulesservice */
-        $exammodulesservice = bizexaminer::get_instance()->get_service('exammodules');
-        $exammodules = $exammodulesservice->get_exam_modules();
-
+    private function get_exam_modules(): array {
         $optiongroups = [
             '' => [
                 'text' => get_string('choosedots'),
             ],
         ];
+
+        if (!$this->apicredentials) {
+            return $optiongroups;
+        }
+
+        /** @var exam_modules $exammodulesservice */
+        $exammodulesservice = bizexaminer::get_instance()->get_service('exammodules', $this->apicredentials);
+        $exammodules = $exammodulesservice->get_exam_modules();
 
         foreach ($exammodules as $id => $exammodule) {
             $optiongrouplabel = $exammodule['name'];
@@ -104,9 +121,13 @@ class exam_modules_select extends \MoodleQuickForm_selectgroups {
      */
     // phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod -- name form QuickForm
     public function validateSubmitValue($value) {
+        if (!$this->apicredentials) {
+            return get_string('exam_module_invalid', 'mod_bizexaminer');
+        }
+
         if ($value !== null) {
             /** @var exam_modules $exammodulesservice */
-            $exammodulesservice = bizexaminer::get_instance()->get_service('exammodules');
+            $exammodulesservice = bizexaminer::get_instance()->get_service('exammodules', $this->apicredentials);
             $exammoduleexists = $exammodulesservice->has_exam_module_content_revision((string)$value);
             if (!$exammoduleexists) {
                 return get_string('exam_module_invalid', 'mod_bizexaminer');

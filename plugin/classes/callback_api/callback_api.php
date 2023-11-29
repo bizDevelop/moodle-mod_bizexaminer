@@ -36,8 +36,7 @@ use moodle_url;
 use required_capability_exception;
 
 /**
- * A service which handles requests via the callback api
- * to trigger certain actions.
+ * A service which handles requests via the callback api to trigger certain actions.
  *
  * @package mod_bizexaminer
  */
@@ -138,7 +137,7 @@ class callback_api {
         require_capability('mod/bizexaminer:attempt', $context);
 
         /** @var exams $examsservice */
-        $examsservice = bizexaminer::get_instance()->get_service('exams');
+        $examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
         try {
             $canaccess = $examsservice->can_access($exam, $userid);
             // Check if user can attempt.
@@ -244,7 +243,7 @@ class callback_api {
         }
 
         /** @var exams $examsservice */
-        $examsservice = bizexaminer::get_instance()->get_service('exams');
+        $examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
         try {
             $ended = $examsservice->end_attempt($attempt, $exam);
             if ($ended === -1) {
@@ -311,7 +310,7 @@ class callback_api {
         $eventtype = required_param('eventType', PARAM_ALPHAEXT);
 
         /** @var exams $examsservice */
-        $examsservice = bizexaminer::get_instance()->get_service('exams');
+        $examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
 
         util::log('callback api event callback with eventtype ' . $eventtype . ' called', DEBUG_ALL);
 
@@ -397,7 +396,7 @@ class callback_api {
         require_capability('mod/bizexaminer:deleteanyattempt', $context);
 
         /** @var exams $examsservice */
-        $examsservice = bizexaminer::get_instance()->get_service('exams');
+        $examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
         $deleted = $examsservice->delete_attempt($attempt);
 
         if (!$deleted) {

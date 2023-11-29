@@ -70,9 +70,12 @@ class mod_form_helper {
 
         $exam->timemodified = util::create_date(time());
 
+        // API Credentials.
+        $exam->apicredentials = $data->api_credentials;
+
         // Exam module.
         /** @var exam_modules $exammodulesservice */
-        $exammodulesservice = bizexaminer::get_instance()->get_service('exammodules');
+        $exammodulesservice = bizexaminer::get_instance()->get_service('exammodules', $exam->get_api_credentials());
         $exammoduleids = $exammodulesservice->explode_exam_module_ids($data->exam_module);
         if ($exammoduleids) {
             $exam->productid = (int)$exammoduleids['product'];
@@ -202,6 +205,8 @@ class mod_form_helper {
 
         // No validation for subnet atm - should be a comma-separated list of ip addresses
         // but even moodle core (quiz, chat) does not validate IPs.
+
+        $defaultvalues['api_credentials'] = $exam->apicredentials;
 
     }
 

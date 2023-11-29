@@ -82,7 +82,7 @@ class exam_modules extends abstract_api_service {
                     $revision = $exammodule->examRevisions[0];
                     $id = $exammodule->productPartsId;
                     // The productId is used for grouping; productPartsId and contentRevisionsId for booking.
-                    $fullid = $this->build_exam_module_id(
+                    $fullid = self::build_exam_module_id(
                         $productid,
                         $exammodule->productPartsId,
                         $revision->crtContentsRevisionsId
@@ -149,7 +149,7 @@ class exam_modules extends abstract_api_service {
      * @param int $contentrevision content revision ID
      * @return string
      */
-    public function build_exam_module_id(int $productid, int $productpartsid, int $contentrevision): string {
+    public static function build_exam_module_id(int $productid, int $productpartsid, int $contentrevision): string {
         return "{$productid}_{$productpartsid}_{$contentrevision}";
     }
 

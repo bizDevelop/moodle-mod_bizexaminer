@@ -72,7 +72,7 @@ $output = ''; // Do not output anything before it's not clear that a redirect mi
 if (!$attempt->hasresults) {
     // Try to fetch results now.
     /** @var exams $examsservice */
-    $examsservice = bizexaminer::get_instance()->get_service('exams');
+    $examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
     $resultsfetched = $examsservice->fetch_results($attempt);
     if ($resultsfetched) {
         $attempt = attempt::get($attempt->id); // Refresh instance.
@@ -86,7 +86,7 @@ if ($attempt->hasresults) {
 $output .= $renderer->attempt_details($exam, $attempt, $results);
 
 /** @var exams $examsservice */
-$examsservice = bizexaminer::get_instance()->get_service('exams');
+$examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
 $canaccess = $examsservice->can_access($exam, $USER->id);
 
 // Only show resuming if user is the same as the student (eg no teachers) of the attempt and has the capability.

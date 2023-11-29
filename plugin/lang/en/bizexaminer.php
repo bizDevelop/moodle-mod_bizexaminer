@@ -52,6 +52,27 @@ $string['bizexaminer:deleteanyattempt'] = 'Delete (any) attempt from a student';
 $string['nocredentials'] = 'Please configure your API credentials.';
 
 // Strings from settings.php (settings).
+$string['settings_apicredentials'] = 'API credentials';
+$string['settings_apicredentials_desc'] = 'Configure your bizExaminer API credentials';
+$string['settings_apicredentials_id'] = 'Id';
+$string['settings_apicredentials_name'] = 'Name';
+$string['settings_apicredentials_name_row'] = 'Name for API Credentials set {$a}';
+$string['settings_apicredentials_instance'] = 'Instance Domain';
+$string['settings_apicredentials_instance_row'] = 'Instance Domain for API Credentials set {$a}';
+$string['settings_apicredentials_key_owner'] = 'API Key Owner';
+$string['settings_apicredentials_key_owner_row'] = 'API Key Owner  for API Credentials set {$a}';
+$string['settings_apicredentials_key_organisation'] = 'API Key Organisation';
+$string['settings_apicredentials_key_organisation_row'] = 'API Key Organisation for API Credentials set {$a}';
+$string['settings_apicredentials_actions'] = 'Actions';
+$string['settings_apicredentials_infos'] = 'Infos';
+$string['settings_apicredentials_used_in_singular'] = 'Used in {$a} exam';
+$string['settings_apicredentials_used_in'] = 'Used in {$a} exams';
+$string['settings_apicredentials_actions_delete'] = 'Delete';
+$string['settings_apicredentials_actions_delete_disabled'] = 'API Credentials cannot be deleted, if they are still used in exams';
+$string['settings_apicredentials_actions_test'] = 'Test';
+$string['settings_apicredentials_error_invalid'] = 'The API credentials you entered are empty, not valid or contain non-valid characters. Please check them again.';
+$string['settings_apicredentials_new_label'] = 'New';
+
 $string['apikeyowner'] = 'API Key Owner';
 $string['apikeyowner_desc'] = 'The API key for the (content) owner.';
 
@@ -63,12 +84,19 @@ $string['apikeyinstance_desc'] = 'The domain name of your bizExaminer instance (
 
 $string['configureapi'] = 'Configure API credentials';
 $string['testapi'] = 'Test credentials';
-$string['checktestapi'] = 'Test credentials';
+$string['checktestapi'] = 'Test bizExaminer API credentials';
 $string['testapi_desc'] = 'Test the stored api credential settings.';
-$string['testapi_error'] = 'Testing the API credentials was not successful. Please check them again.';
+$string['testapi_error'] = 'Testing of some API credentials was not successful.';
 $string['testapi_success'] = 'Testing the API credentials was successful.';
+$string['testapi_credentials_valid'] = 'Valid';
+$string['testapi_credentials_invalid'] = 'Invalid';
 
 // Strings from module form.
+$string['modform_api_credentials'] = 'API Credentials';
+$string['modform_api_credentials_help'] = 'Select API Credentials to connect to bizExaminer and then save. You can configure them in the Plugin Settings.';
+$string['modform_api_credentials_save'] = 'Save API Credentials';
+$string['modform_api_credentials_invalid'] = 'The credentials configured for this are not valid or do not exist.';
+$string['modform_api_credentials_save_help'] = 'After choosing the API credentials save the form to reload and show available exam modules and remote proctor options.';
 $string['modform_exam_module'] = 'Exam Module';
 $string['modform_exam_module_help'] = 'Select an exam module and a content revision.';
 $string['exam_module_invalid'] = 'Please select a valid exam module.';

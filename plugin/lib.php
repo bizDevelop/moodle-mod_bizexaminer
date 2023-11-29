@@ -34,7 +34,7 @@ use mod_bizexaminer\mod_form\mod_form_helper;
  * "extra" information that may be needed when printing
  * this activity in a course listing.
  *
- * See {@link course_modinfo::get_array_of_activities()}
+ * @see course_modinfo::get_array_of_activities()
  *
  * @param object $coursemodule
  * @return cached_cm_info info
@@ -161,7 +161,7 @@ function bizexaminer_delete_instance($id) {
     $exam = exam::get($id);
 
     /** @var exams $examsservice */
-    $examsservice = bizexaminer::get_instance()->get_service('exams');
+    $examsservice = bizexaminer::get_instance()->get_service('exams', $exam->get_api_credentials());
 
     // Delete attempts, results, grades, gradebook api.
     $examsservice->delete_all_attempts($exam);
@@ -178,6 +178,11 @@ function bizexaminer_delete_instance($id) {
 
 // TODO: Additional/missing lib.php functions/callbacks (#16).
 
+/**
+ * Add cron related service status checks
+ *
+ * @return array of check objects
+ */
 function mod_bizexaminer_status_checks(): array {
     return [new \mod_bizexaminer\check\testapi()];
 }
@@ -208,7 +213,8 @@ function bizexaminer_extend_settings_navigation(settings_navigation $settings, n
  * Implementation of the function for printing the form elements that control
  * whether the course reset functionality affects the exam.
  *
- * @param $mform the course reset form that is being built.
+ * @param mixed $mform the course reset form that is being built.
+ * @return void
  */
 function bizexaminer_reset_course_form_definition($mform) {
     $mform->addElement('header', 'bizexaminerheader', get_string('pluginname', 'mod_bizexaminer'));
@@ -216,6 +222,14 @@ function bizexaminer_reset_course_form_definition($mform) {
             get_string('resetform_remove_attempts', 'mod_bizexaminer'));
 }
 
+/**
+ * This function is used by the reset_course_userdata function in moodlelib.
+ * This function will remove all attempts for an exam in the database
+ * and clean up any related data.
+ *
+ * @param stdClass $data the data submitted from the reset course.
+ * @return array
+ */
 function bizexaminer_reset_userdata($data) {
     /** @var moodle_database $DB */ // phpcs:ignore moodle.Commenting.InlineComment.TypeHintingMatch
     global $DB;
@@ -255,7 +269,8 @@ function bizexaminer_reset_userdata($data) {
 
 /**
  * Course reset form defaults.
- * @return array the defaults.
+ * @param  object $course
+ * @return array
  */
 function bizexaminer_reset_course_form_defaults($course) {
     return ['reset_exam_attempts' => 1];
@@ -272,6 +287,7 @@ function bizexaminer_reset_course_form_defaults($course) {
  * @param stdClass $actvitiymodule the activity module settings
  * @param int $userid A user ID or 0 for all users
  * @param bool $nullifnone Whether to create a null rawgrade for if a single user is specified and they don't have a grade yet
+ * @return void
  */
 function bizexaminer_update_grades($actvitiymodule, $userid = null, $nullifnone = true) {
     global $CFG;
@@ -347,14 +363,14 @@ function bizexaminer_grade_item_delete($actvitiymodule) {
  *
  * Called by bizexaminer_update_grades
  * or maybe after adding/updating an exam instance
- * or when resetting the gradebook @see quiz_set_grade
- * or maybe with _set_grade method? @see quiz
+ * or when resetting the gradebook {@see quiz_set_grade}
+ * or maybe with _set_grade method? {@see quiz}
  *
 
  *
  * Code inspired by examples in documentation (forum activity module) and quiz module
  *
- * @param stdClass $exam object with extra cmidnumber
+ * @param stdClass $actvitiymodule object with extra cmidnumber
  * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return int 0 if ok, error code otherwise
  */

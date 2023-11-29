@@ -49,9 +49,9 @@ class remote_proctor_options_group extends \MoodleQuickForm_group {
      /**
       * Constructor
       *
-      * @param string $elementName Select name attribute
-      * @param mixed $proctor proctor type
-      * @param mixed $proctorfields fields config for this proctor (@see remote_proctors::class)
+      * @param string $elementname Select name attribute
+      * @param string $proctor proctor type
+      * @param array $proctorfields fields config for this proctor {@see remote_proctors::class}
       */
     public function __construct(string $elementname, string $proctor, array $proctorfields) {
         parent::__construct($elementname, get_string("modform_{$proctor}_settings", 'mod_bizexaminer'));
