@@ -24,10 +24,6 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "zip_file=$ZIP_FILE" >> $GITHUB_OUTPUT
       - name: Build zip
-        with:
-          build_dir: ${{ steps.vars.outputs.build_dir }}
-          plugin_slug: ${{ steps.vars.outputs.plugin_slug }}
-          zip_file: ${{ steps.vars.outputs.zip_file }}
         run: |
           mv "${{ steps.vars.outputs.build_dir }}" "${{ steps.vars.outputs.plugin_slug }}"
           zip -r "${{ steps.vars.outputs.zip_file }}" "${{ steps.vars.outputs.plugin_slug }}"
