@@ -15,7 +15,7 @@ jobs:
         id: vars
         run: |
           PLUGIN_SLUG="bizexaminer"
-          BUILD_DIR="plugin"
+          BUILD_DIR="."
           VERSION_FILE="plugin/version.php"
           VERSION=$(sed -n "s/.*version = *\([0-9.]*\);/\1/p" $VERSION_FILE)
           ZIP_FILE="mod_bizexaminer-$VERSION.zip"
@@ -26,6 +26,7 @@ jobs:
       - name: Build zip
         run: |
           mv "${{ steps.vars.outputs.build_dir }}" "${{ steps.vars.outputs.plugin_slug }}"
+          rm "${{ steps.vars.outputs.plugin_slug }}/.github"
           zip -r "${{ steps.vars.outputs.zip_file }}" "${{ steps.vars.outputs.plugin_slug }}"
       - name: Upload release asset
         uses: actions/upload-release-asset@v1

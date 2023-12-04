@@ -122,6 +122,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Changelog ##
 
+### 1.1.1 (2023-12-04) ###
+- Dev: Rename GitHub release repository and restructure to be compatible with the expected directory structure from Moodle
+
 ### 1.1.0 (2023-11-29) ###
 - New: Add option to configure multiple API credentials
 - Tweak: Re-Add German translations for easier testing before plugin is live in Moodle repository
