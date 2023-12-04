@@ -11,22 +11,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          path: 'src'
       - name: Variables
         id: vars
         run: |
           PLUGIN_SLUG="bizexaminer"
-          BUILD_DIR="."
+          SRC_DIR="src"
           VERSION_FILE="version.php"
           VERSION=$(sed -n "s/.*version = *\([0-9.]*\);/\1/p" $VERSION_FILE)
           ZIP_FILE="mod_bizexaminer-$VERSION.zip"
           echo "plugin_slug=$PLUGIN_SLUG" >> $GITHUB_OUTPUT
-          echo "build_dir=$BUILD_DIR" >> $GITHUB_OUTPUT
+          echo "src_dir=$SRC_DIR" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "zip_file=$ZIP_FILE" >> $GITHUB_OUTPUT
       - name: Build zip
         run: |
-          mv "${{ steps.vars.outputs.build_dir }}" "${{ steps.vars.outputs.plugin_slug }}"
-          rm "${{ steps.vars.outputs.plugin_slug }}/.github"
+          cp -r "${{ steps.vars.outputs.src_dir }}" "${{ steps.vars.outputs.plugin_slug }}"
+          rm -r "${{ steps.vars.outputs.plugin_slug }}/.github"
+          rm -r "${{ steps.vars.outputs.plugin_slug }}/.git"
           zip -r "${{ steps.vars.outputs.zip_file }}" "${{ steps.vars.outputs.plugin_slug }}"
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
