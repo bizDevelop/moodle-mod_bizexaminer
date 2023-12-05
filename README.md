@@ -122,6 +122,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Changelog ##
 
+### 1.1.2 (2023-12-05) ###
+- Fix: fix warnings on saving first api credentials
+- Compatibility/Dev: Add info about supported Moodle versions in `version.php` via `supported` key (see [GitHub issue](https://github.com/bizDevelop/moodle-mod_bizexaminer/issues/1#issuecomment-1840275570))
+
 ### 1.1.1 (2023-12-04) ###
 - Dev: Rename GitHub release repository and restructure to be compatible with the expected directory structure from Moodle
 

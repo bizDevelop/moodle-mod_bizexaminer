@@ -87,7 +87,7 @@ class admin_setting_api_credentials extends \admin_setting {
      */
     private function create_setting_fields() {
         $rawids = get_config('mod_bizexaminer', $this->name);
-        $ids = explode(':', $rawids);
+        $ids = array_filter(explode(':', $rawids));
         $ids[] = 'new';
         $index = 1;
         foreach ($ids as $id) {

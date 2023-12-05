@@ -19,7 +19,7 @@ jobs:
           PLUGIN_SLUG="bizexaminer"
           SRC_DIR="src"
           VERSION_FILE="$SRC_DIR/version.php"
-          VERSION=$(sed -n "s/.*version = *\([0-9.]*\);/\1/p" $VERSION_FILE)
+          VERSION=$(sed -n "s/.*version = *\([0-9.]*\).*/\1/p" $VERSION_FILE)
           ZIP_FILE="mod_bizexaminer-$VERSION.zip"
           echo "plugin_slug=$PLUGIN_SLUG" >> $GITHUB_OUTPUT
           echo "src_dir=$SRC_DIR" >> $GITHUB_OUTPUT

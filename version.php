@@ -24,8 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_bizexaminer';
-$plugin->release = '1.1.1';
-$plugin->version = 2023120400;
+$plugin->component = 'mod_bizexaminer'; // Full name of the plugin.
+$plugin->release = '1.1.2'; // Semver release version number.
+$plugin->version = 2023120500; // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires = 2023042401;
 $plugin->maturity = MATURITY_STABLE;
+$plugin->supported = [402]; // A range of branch numbers of supported moodle versions.
