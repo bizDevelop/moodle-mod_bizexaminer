@@ -29,4 +29,4 @@ $plugin->release = '1.1.2'; // Semver release version number.
 $plugin->version = 2023120500; // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires = 2023042401;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->supported = [402]; // A range of branch numbers of supported moodle versions.
+$plugin->supported = [402, 402]; // A range of branch numbers of supported moodle versions.
