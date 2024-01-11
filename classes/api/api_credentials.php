@@ -149,12 +149,19 @@ class api_credentials {
         return new api_client($this);
     }
 
+    public function are_valid(): bool {
+        return !empty($this->instance) && !empty($this->ownerkey) && !empty(($this->organisationkey));
+    }
+
     /**
      * Test if credentials are valid by calling a simple function on the API
      *
      * @return bool
      */
     public function test_credentials(): bool {
+        if (!$this->are_valid()) {
+            return false;
+        }
         return $this->get_api_client()->test_credentials();
     }
 

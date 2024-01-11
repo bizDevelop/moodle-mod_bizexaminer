@@ -401,6 +401,35 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
         $this->modformhelper->load_feedback_values($defaultvalues, $this->feedbacks);
     }
 
+    /**
+     * This method is called after definition(), data submission and set_data().
+     * All form setup that is dependent on form values should go in here.
+     *
+     * Get current submitted API credentials and set those in api-dependent fields (exams, remote proctors)
+     * So those fields can load the values from the correct/new api credentials and
+     * validate the selected value against those.
+     * Important for when changing API credentials in an existing exam.
+     */
+    public function definition_after_data() {
+        $mform = $this->_form;
+        $apicredentialsfield = $mform->getElement('api_credentials');
+        $apicredentialsvalue = $apicredentialsfield->getValue();
+
+        if (!empty($apicredentialsvalue) && !empty($apicredentialsvalue[0])) {
+            // Test if those api credentials exist, if not just don't select them.
+            $apicredentials = api_credentials::get_by_id($apicredentialsvalue[0]);
+            if ($apicredentials && $apicredentials->are_valid()) {
+                /** @var exam_modules_select $examselectfield */
+                $examselectfield = $mform->getElement('exam_module');
+                $examselectfield->set_api_credentials($apicredentials);
+
+                /** @var remote_proctor_select $remoteproctorselectfield */
+                $remoteproctorselectfield = $mform->getElement('remote_proctor');
+                $remoteproctorselectfield->set_api_credentials($apicredentials);
+            }
+        }
+    }
+
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

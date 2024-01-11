@@ -122,6 +122,11 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Changelog ##
 
+### 1.2.0 (2024-01-11) ###
+- Compatibility: Support Moodle 4.3 and PHP 8.2
+- Fix: Error when changing API Credentials in existing exam
+- Fix: Supported Moodle versions format in `version.php`
+
 ### 1.1.2 (2023-12-05) ###
 - Fix: fix warnings on saving first api credentials
 - Compatibility/Dev: Add info about supported Moodle versions in `version.php` via `supported` key (see [GitHub issue](https://github.com/bizDevelop/moodle-mod_bizexaminer/issues/1#issuecomment-1840275570))

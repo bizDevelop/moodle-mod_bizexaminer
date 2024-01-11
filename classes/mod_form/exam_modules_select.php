@@ -72,23 +72,35 @@ class exam_modules_select extends \MoodleQuickForm_selectgroups {
         // Even if the constructor gets called twice we do not really want 2x options (crazy forms!).
         $this->_optGroups = [];
         parent::__construct($elementname, $elementlabel, [], $attributes, false);
-        $this->loadArrayOptGroups($this->get_exam_modules());
+        $this->load_exam_modules_options();
     }
 
     /**
-     * Get the exam modules from API and map them to the correct format.
+     * Sets the API Credentials to use in the select and updates the options
      *
-     * @return array
+     * @param null|api_credentials $apicredentials
+     * @return void
      */
-    private function get_exam_modules(): array {
+    public function set_api_credentials(?api_credentials $apicredentials): void {
+        $this->apicredentials = $apicredentials;
+        $this->load_exam_modules_options();
+    }
+
+    /**
+     * Get the exam modules from API and map them to the correct format and load them into options
+     *
+     * @return void
+     */
+    private function load_exam_modules_options(): void {
         $optiongroups = [
             '' => [
                 'text' => get_string('choosedots'),
             ],
         ];
 
-        if (!$this->apicredentials) {
-            return $optiongroups;
+        if (!$this->apicredentials || !$this->apicredentials->are_valid()) {
+            $this->loadArrayOptGroups($optiongroups);
+            return;
         }
 
         /** @var exam_modules $exammodulesservice */
@@ -110,7 +122,7 @@ class exam_modules_select extends \MoodleQuickForm_selectgroups {
             self::$fetchoptionserroradded = true;
         }
 
-        return $optiongroups;
+        $this->loadArrayOptGroups($optiongroups);
     }
 
     /**
@@ -121,7 +133,7 @@ class exam_modules_select extends \MoodleQuickForm_selectgroups {
      */
     // phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod -- name form QuickForm
     public function validateSubmitValue($value) {
-        if (!$this->apicredentials) {
+        if (!$this->apicredentials || !$this->apicredentials->are_valid()) {
             return get_string('exam_module_invalid', 'mod_bizexaminer');
         }
 

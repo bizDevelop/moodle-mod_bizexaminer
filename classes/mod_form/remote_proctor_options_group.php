@@ -102,7 +102,7 @@ class remote_proctor_options_group extends \MoodleQuickForm_group {
             }
             if ($element) {
                 if (!empty($proctorfield['help_text'])) {
-                    $element->__helpbutton = $OUTPUT->help_icon($labelname, 'mod_bizexaminer');
+                    $element->_helpbutton = $OUTPUT->help_icon($labelname, 'mod_bizexaminer');
                 }
                 $this->_elements[] = $element;
             }

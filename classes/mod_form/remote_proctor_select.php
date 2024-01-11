@@ -71,6 +71,26 @@ class remote_proctor_select extends \MoodleQuickForm_select {
         // Even if the constructor gets called twice we do not really want 2x options (crazy forms!).
         $this->_options = [];
         parent::__construct($elementname, $elementlabel, [], $attributes, true);
+            $this->load_remote_proctors_options();
+    }
+
+    /**
+     * Sets the API Credentials to use in the select and updates the options
+     *
+     * @param null|api_credentials $apicredentials
+     * @return void
+     */
+    public function set_api_credentials(?api_credentials $apicredentials): void {
+        $this->apicredentials = $apicredentials;
+        $this->load_remote_proctors_options();
+    }
+
+    /**
+     * Updates the available remote proctors and updates the list of possible options
+     *
+     * @return void
+     */
+    private function load_remote_proctors_options(): void {
         $this->loadArray($this->get_remote_proctors());
     }
 
@@ -84,7 +104,7 @@ class remote_proctor_select extends \MoodleQuickForm_select {
             '' => get_string('choosedots'),
         ];
 
-        if (!$this->apicredentials) {
+        if (!$this->apicredentials || !$this->apicredentials->are_valid()) {
             return $options;
         }
 
@@ -140,7 +160,7 @@ class remote_proctor_select extends \MoodleQuickForm_select {
      * @return string|null Validation error message or null.
      */
     public function validateSubmitValue($value) { // phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod
-        if (!$this->apicredentials) {
+        if (!$this->apicredentials || !$this->apicredentials->are_valid()) {
             return get_string('modform_remote_proctor_invalid', 'mod_bizexaminer');
         }
 
