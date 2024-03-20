@@ -25,13 +25,13 @@
 namespace mod_bizexaminer;
 
 use coding_exception;
-use mod_bizexaminer\api\api_client;
-use mod_bizexaminer\api\api_credentials;
-use mod_bizexaminer\api\exam_modules;
-use mod_bizexaminer\api\exams;
-use mod_bizexaminer\api\remote_proctors;
-use mod_bizexaminer\callback_api\callback_api;
-use mod_bizexaminer\gradebook\grading;
+use mod_bizexaminer\local\api\api_client;
+use mod_bizexaminer\local\api\api_credentials;
+use mod_bizexaminer\local\api\exam_modules;
+use mod_bizexaminer\local\api\exams;
+use mod_bizexaminer\local\api\remote_proctors;
+use mod_bizexaminer\local\callback_api\callback_api;
+use mod_bizexaminer\local\gradebook\grading;
 use mod_bizexaminer\settings;
 
 /**
@@ -109,17 +109,26 @@ class bizexaminer {
             throw new coding_exception('service ' . $key . ' is not defined in bizExaminer.');
         }
 
+        $instancekey = $key;
+        // Create unique instances for different args.
+        if (!empty($args)) {
+            $instancekey = $key . '_' . md5(serialize($args));
+        }
+
         // Create instance if not already exists.
-        if (!array_key_exists($key, $this->services)) {
+        if (!array_key_exists($instancekey, $this->services)) {
             if (is_callable($servicedefinition)) {
-                $this->services[$key] = $servicedefinition($this, ...$args);
+                $this->services[$instancekey] = $servicedefinition($this, ...$args);
             }
         }
 
-        if (!$this->services[$key]) {
+        if (!$this->services[$instancekey]) {
+            if (!empty($args)) {
+                throw new coding_exception('there was an error creating a service instance for ' . $key . ' with unique args.');
+            }
             throw new coding_exception('there was an error creating a service instance for ' . $key);
         }
-        return $this->services[$key];
+        return $this->services[$instancekey];
 
     }
 

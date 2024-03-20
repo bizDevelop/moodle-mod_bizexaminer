@@ -23,11 +23,11 @@
  */
 
 use mod_bizexaminer\bizexaminer;
-use mod_bizexaminer\data_objects\attempt;
-use mod_bizexaminer\data_objects\exam_grade;
-use mod_bizexaminer\data_objects\exam;
-use mod_bizexaminer\gradebook\grading;
-use mod_bizexaminer\mod_form\mod_form_helper;
+use mod_bizexaminer\local\data_objects\attempt;
+use mod_bizexaminer\local\data_objects\exam_grade;
+use mod_bizexaminer\local\data_objects\exam;
+use mod_bizexaminer\local\gradebook\grading;
+use mod_bizexaminer\local\mod_form\mod_form_helper;
 
 /**
  * Given a course_module object, this function returns any

@@ -26,7 +26,7 @@
  */
 
 use mod_bizexaminer\bizexaminer;
-use mod_bizexaminer\callback_api\callback_api;
+use mod_bizexaminer\local\callback_api\callback_api;
 
 // Disable moodle specific debug messages and any errors in output,
 // comment out when debugging or better look into error log!

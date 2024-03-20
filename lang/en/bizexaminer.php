@@ -69,7 +69,7 @@ $string['settings_apicredentials_used_in_singular'] = 'Used in {$a} exam';
 $string['settings_apicredentials_used_in'] = 'Used in {$a} exams';
 $string['settings_apicredentials_actions_delete'] = 'Delete';
 $string['settings_apicredentials_actions_delete_disabled'] = 'API Credentials cannot be deleted, if they are still used in exams';
-$string['settings_apicredentials_actions_test'] = 'Test';
+$string['settings_apicredentials_actions_test_disabled'] = 'Please save your changes before testing the credentials.';
 $string['settings_apicredentials_error_invalid'] = 'The API credentials you entered are empty, not valid or contain non-valid characters. Please check them again.';
 $string['settings_apicredentials_new_label'] = 'New';
 

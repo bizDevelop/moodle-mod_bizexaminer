@@ -34,10 +34,10 @@ use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
 use mod_bizexaminer\bizexaminer;
-use mod_bizexaminer\data_objects\attempt;
-use mod_bizexaminer\data_objects\attempt_results;
-use mod_bizexaminer\data_objects\exam;
-use mod_bizexaminer\gradebook\grading;
+use mod_bizexaminer\local\data_objects\attempt;
+use mod_bizexaminer\local\data_objects\attempt_results;
+use mod_bizexaminer\local\data_objects\exam;
+use mod_bizexaminer\local\gradebook\grading;
 use mod_bizexaminer\util;
 
 class provider implements

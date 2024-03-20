@@ -15,18 +15,41 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * abstract api service
  *
  * @package     mod_bizexaminer
+ * @category    api
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_bizexaminer\local\api;
 
-$plugin->component = 'mod_bizexaminer'; // Full name of the plugin.
-$plugin->release = '1.3.0'; // Semver release version number.
-$plugin->version = 2024032000; // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires = 2023042401;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->supported = [402, 403]; // A range of branch numbers of supported moodle versions.
+/**
+ * An abstract API service which has access to an api client
+ *
+ * @package mod_bizexaminer
+ */
+abstract class abstract_api_service {
+    /**
+     * API Client of this instance to use
+     * @var api_client
+     */
+    protected api_client $api;
+
+    /**
+     * Create a new service instance
+     * @param api_client $apiclient API Client to use in this instance
+     */
+    public function __construct(api_client $apiclient) {
+        $this->api = $apiclient;
+    }
+
+    /**
+     * Get the API client instance to use
+     * @return api_client
+     */
+    protected function get_api(): api_client {
+        return $this->api;
+    }
+}

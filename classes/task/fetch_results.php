@@ -25,10 +25,10 @@
 
 namespace mod_bizexaminer\task;
 
-use mod_bizexaminer\api\exams;
+use mod_bizexaminer\local\api\exams;
 use mod_bizexaminer\bizexaminer;
 use mod_bizexaminer\bizexaminer_exception;
-use mod_bizexaminer\data_objects\attempt;
+use mod_bizexaminer\local\data_objects\attempt;
 
 /**
  * Scheduled task to fetch results for a specific attempt.

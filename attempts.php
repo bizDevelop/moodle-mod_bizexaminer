@@ -22,9 +22,9 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_bizexaminer\data_objects\attempt;
-use mod_bizexaminer\data_objects\exam;
-use mod_bizexaminer\gradebook\grading;
+use mod_bizexaminer\local\data_objects\attempt;
+use mod_bizexaminer\local\data_objects\exam;
+use mod_bizexaminer\local\gradebook\grading;
 use mod_bizexaminer\util;
 
 require(__DIR__.'/../../config.php');

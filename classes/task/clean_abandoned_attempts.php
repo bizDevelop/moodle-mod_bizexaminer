@@ -25,7 +25,7 @@
 
 namespace mod_bizexaminer\task;
 
-use mod_bizexaminer\data_objects\attempt;
+use mod_bizexaminer\local\data_objects\attempt;
 use mod_bizexaminer\util;
 use moodle_database;
 

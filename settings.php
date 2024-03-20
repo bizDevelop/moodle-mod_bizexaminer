@@ -23,8 +23,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_bizexaminer\admin\admin_setting_api_credentials;
-use mod_bizexaminer\bizexaminer;
+use mod_bizexaminer\local\admin\admin_setting_api_credentials;
 
 defined('MOODLE_INTERNAL') || die();
 

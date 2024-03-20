@@ -23,10 +23,10 @@
  */
 
 use mod_bizexaminer\bizexaminer;
-use mod_bizexaminer\callback_api\callback_api;
-use mod_bizexaminer\data_objects\attempt;
-use mod_bizexaminer\data_objects\exam;
-use mod_bizexaminer\gradebook\grading;
+use mod_bizexaminer\local\callback_api\callback_api;
+use mod_bizexaminer\local\data_objects\attempt;
+use mod_bizexaminer\local\data_objects\exam;
+use mod_bizexaminer\local\gradebook\grading;
 use mod_bizexaminer\util;
 
 require(__DIR__.'/../../config.php');

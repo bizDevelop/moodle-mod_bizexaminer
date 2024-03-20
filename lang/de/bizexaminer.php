@@ -61,12 +61,18 @@ $string['apikeyorganisation_desc'] = 'Der API Schlüssel für die Organisation.'
 $string['apikeyinstance'] = 'Instanz Domain';
 $string['apikeyinstance_desc'] = 'Der Domainname Ihrer bizExaminer Instanz (ohne https:// oder Pfad).';
 
+$string['settings_apicredentials_actions_delete'] = 'Löschen';
+$string['settings_apicredentials_actions_delete_disabled'] = 'API Zugangsdaten können nicht gelöscht werden, wenn sie noch in Prüfungen verwendet werden.';
+$string['settings_apicredentials_actions_test_disabled'] = 'Bitte speicheren Sie Ihre Änderungen, bevor sie die Zugangsdaten testen.';
+
+
 $string['configureapi'] = 'API Zugangsdaten konfigurieren';
 $string['testapi'] = 'Zugangsdaten testen';
 $string['checktestapi'] = 'Zugangsdaten testen';
 $string['testapi_desc'] = 'Teste API Zugangsdaten.';
 $string['testapi_error'] = 'Testen der API Zugangsdaten war fehlerhaft. Bitte überprüfen Sie die Zugangsdaten.';
 $string['testapi_success'] = 'Testen der API Zugangsdaten war erfolgreich.';
+$string['test_credential'] = 'Prüfen';
 
 // Strings from module form.
 $string['modform_exam_module'] = 'Exam Modul';

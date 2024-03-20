@@ -4,7 +4,7 @@ bizExaminer is a software solution to create, conduct and manage online exams.
 Our Moodle plugin allows you to include exams in your courses.
 
 bizExaminer is a **complete** and stable solution for stress-free examination.  
-**Important:** You need a bizExaminer account to use this plugin. You can request a free demo on [our website](https://www.bizexaminer.com/en/#demo). 
+**Important:** You need a bizExaminer account to use this plugin. You can request a free demo on [our website](https://www.bizexaminer.com/#demo). 
 
 ## Features of bizExaminer ##
 
@@ -16,7 +16,7 @@ bizExaminer is a **complete** and stable solution for stress-free examination.
 - Preview and "tryout" questions and exams for authors.
 - Advanced content administration.
 - Reliable and stable in case of technical problems during an exam.
-- [And much more...](https://www.bizexaminer.com/en/features/)
+- [And much more...](https://www.bizexaminer.com/features/)
 
 https://www.youtube.com/watch?v=PkGmyH4JEIQ
 
@@ -62,7 +62,7 @@ Professional help desk support is being offered to bizExaminer customers only.
 Also visit our [support page](https://support.bizexaminer.com/article/using-the-bizexaminer-moodle-plugin/)
 
 ### Want to file a bug or improve the bizExaminer Moodle plugin? ###
-Bug reports may be filed via the comments in the Moodle plugin directory. If you have found security vulnerability, please [contact us](https://www.bizexaminer.com/en/contact/) immediately.
+Bug reports may be filed via the comments in the Moodle plugin directory. If you have found security vulnerability, please [contact us](https://www.bizexaminer.com/contact/) immediately.
 
 ## Installation ##
 
@@ -121,6 +121,15 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Changelog ##
+
+### 1.3.0 (2024-03-20) ###
+- Tweak: "Test credentials" button is now disabled when you have unsaved changes in the API credentials settings, to prevent you from discarding those changes
+- Fix: Deprecation warnings regarding `explode` on plugin activation
+- Fix: "Element exam_module does not exist" errors when starting an exam
+- Fix: Switching API Credentials in exam
+- Fix: Update website links
+- Dev: Fix namespaces to align with moodle namespacing guide.
+- Dev: Add a build process for JavaScript files.
 
 ### 1.2.0 (2024-01-11) ###
 - Compatibility: Support Moodle 4.3 and PHP 8.2

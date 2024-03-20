@@ -25,7 +25,7 @@
 
 namespace mod_bizexaminer;
 
-use mod_bizexaminer\api\api_credentials;
+use mod_bizexaminer\local\api\api_credentials;
 use moodle_exception;
 use moodle_url;
 

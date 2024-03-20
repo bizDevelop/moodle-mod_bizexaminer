@@ -29,7 +29,7 @@ use context_module;
 use core\check\performance\debugging;
 use core\task\adhoc_task;
 use DateTime;
-use mod_bizexaminer\data_objects\exam;
+use mod_bizexaminer\local\data_objects\exam;
 use stdClass;
 use Throwable;
 

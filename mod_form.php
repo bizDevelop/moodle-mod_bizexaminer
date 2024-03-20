@@ -24,16 +24,16 @@
  */
 
 use core_grades\component_gradeitems;
-use mod_bizexaminer\api\api_credentials;
-use mod_bizexaminer\api\remote_proctors;
+use mod_bizexaminer\local\api\api_credentials;
+use mod_bizexaminer\local\api\remote_proctors;
 use mod_bizexaminer\bizexaminer;
-use mod_bizexaminer\data_objects\exam;
-use mod_bizexaminer\data_objects\exam_feedback;
-use mod_bizexaminer\gradebook\grading;
-use mod_bizexaminer\mod_form\exam_modules_select;
-use mod_bizexaminer\mod_form\mod_form_helper;
-use mod_bizexaminer\mod_form\remote_proctor_options_group;
-use mod_bizexaminer\mod_form\remote_proctor_select;
+use mod_bizexaminer\local\data_objects\exam;
+use mod_bizexaminer\local\data_objects\exam_feedback;
+use mod_bizexaminer\local\gradebook\grading;
+use mod_bizexaminer\local\mod_form\exam_modules_select;
+use mod_bizexaminer\local\mod_form\mod_form_helper;
+use mod_bizexaminer\local\mod_form\remote_proctor_options_group;
+use mod_bizexaminer\local\mod_form\remote_proctor_select;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
@@ -145,9 +145,8 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
         // When the save_api_credentials submit form is clicked,
         // We try to get the submitted api credentials and set them in the exam instance in this class.
         // So it can be used below to show api-dependent fields.
-        $savedapicredentials = $this->optional_param('save_api_credentials', '', PARAM_TEXT);
-        $submittedapicredentials = $this->optional_param('api_credentials', '', PARAM_RAW);
-        if (!empty($savedapicredentials)) {
+        if ($this->optional_param('save_api_credentials', 0, PARAM_TEXT)) {
+            $submittedapicredentials = $this->optional_param('api_credentials', '', PARAM_RAW);
             // Test if those api credentials exist, if not just don't select them.
             if (api_credentials::get_by_id($submittedapicredentials)) {
                 $this->exam->apicredentials = $submittedapicredentials;
@@ -158,7 +157,9 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
         // To disable the api-dependent fields, they are disabledIf different than the previous chosen api credentials.
         $mform->addElement('static', 'save_api_credentials_description', '',
             get_string('modform_api_credentials_save_help', 'mod_bizexaminer'));
-        $mform->registerNoSubmitButton('save_api_credentials'); // Do not trigger saving of form. Must be before adding field.
+        // Submit the form, but do not trigger saving of the form / activity. Must be before adding field.
+        // See https://moodledev.io/docs/apis/subsystems/form/advanced/no-submit-button .
+        $mform->registerNoSubmitButton('save_api_credentials');
         $mform->addElement('submit', 'save_api_credentials',
             get_string('modform_api_credentials_save', 'mod_bizexaminer'), [], false);
         $mform->disabledIf('save_api_credentials', 'api_credentials', 'noitemselected');
@@ -168,40 +169,56 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
             $mform->disabledIf('save_api_credentials', 'api_credentials', 'eq', $this->exam->apicredentials);
         }
 
-        // Other fiels should only be shown if any credentials (even invalid) are selected.
-        if (!$this->exam->apicredentials) {
-            return;
-        }
+        // Always add api-credentials dependent fields, so form knows which values to validate/save.
+        // But if no apicredentials are selected, hide them full - even after selecting one on the client.
+        // The user must first save the api credentials, so that the form is reload and the
+        // list of exam modules can be fetched server side.
 
+        // Do not pass api credentials, instead let define_after_data handle it.
+        // It will pass the most current value (currently submitted or previously saved).
         $mform->addElement(new exam_modules_select(
-                'exam_module', get_string('modform_exam_module', 'mod_bizexaminer'), [],
-                $this->exam->get_api_credentials()
+                'exam_module', get_string('modform_exam_module', 'mod_bizexaminer'), []
         ));
         $mform->addHelpButton('exam_module', 'modform_exam_module', 'mod_bizexaminer');
         // Select field type checks for allowed options by default; additionally require a value.
         $mform->addRule('exam_module', null, 'required', null, 'client');
-        $mform->disabledIf('exam_module', 'api_credentials', 'noitemselected');
-        $mform->disabledIf('exam_module', 'api_credentials', 'eq', '');
 
         $mform->addElement('selectyesno', 'usebecertificate', get_string('modform_usebecertificate', 'mod_bizexaminer'));
         $mform->addHelpButton('usebecertificate', 'modform_usebecertificate', 'mod_bizexaminer');
-        $mform->disabledIf('usebecertificate', 'api_credentials', 'noitemselected');
-        $mform->disabledIf('usebecertificate', 'api_credentials', 'eq', '');
 
+        // Do not pass api credentials, instead let define_after_data handle it.
+        // It will pass the most current value (currently submitted or previously saved).
         $mform->addElement(new remote_proctor_select(
-            'remote_proctor', get_string('modform_remote_proctor', 'mod_bizexaminer'), [],
-            $this->exam->get_api_credentials()
+            'remote_proctor', get_string('modform_remote_proctor', 'mod_bizexaminer'), []
         ));
         $mform->addHelpButton('remote_proctor', 'modform_remote_proctor', 'mod_bizexaminer');
-        $mform->disabledIf('remote_proctor', 'api_credentials', 'noitemselected');
-        $mform->disabledIf('remote_proctor', 'api_credentials', 'eq', '');
 
-        // Disable api-dependent fields if different api credentials than previously selected are chosen.
-        // Use has to submit save_api_credentials button first.
         if ($this->exam->apicredentials) {
+            // Disable api-dependent fields if no api credentials are selected.
+            $mform->disabledIf('exam_module', 'api_credentials', 'noitemselected');
+            $mform->disabledIf('exam_module', 'api_credentials', 'eq', '');
+            $mform->disabledIf('usebecertificate', 'api_credentials', 'noitemselected');
+            $mform->disabledIf('usebecertificate', 'api_credentials', 'eq', '');
+            $mform->disabledIf('remote_proctor', 'api_credentials', 'noitemselected');
+            $mform->disabledIf('remote_proctor', 'api_credentials', 'eq', '');
+
+            // Disable api-dependent fields if different api credentials than previously selected are chosen.
+            // User has to submit save_api_credentials button first.
             $mform->disabledIf('exam_module', 'api_credentials', 'neq', $this->exam->apicredentials);
             $mform->disabledIf('usebecertificate', 'api_credentials', 'neq', $this->exam->apicredentials);
             $mform->disabledIf('remote_proctor', 'api_credentials', 'neq', $this->exam->apicredentials);
+        } else {
+            // If no api credentials are selected, we want to always hide the fields
+            // so the user is forced to save the api credentials.
+            $mform->hideIf('exam_module', 'api_credentials', 'noitemselected');
+            $mform->hideIf('exam_module', 'api_credentials', 'eq', '');
+            $mform->hideIf('exam_module', 'api_credentials', 'neq', '');
+            $mform->hideIf('usebecertificate', 'api_credentials', 'noitemselected');
+            $mform->hideIf('usebecertificate', 'api_credentials', 'eq', '');
+            $mform->hideIf('usebecertificate', 'api_credentials', 'neq', '');
+            $mform->hideIf('remote_proctor', 'api_credentials', 'noitemselected');
+            $mform->hideIf('remote_proctor', 'api_credentials', 'eq', '');
+            $mform->hideIf('remote_proctor', 'api_credentials', 'neq', '');
         }
 
         $this->add_remote_proctor_fields();
@@ -409,6 +426,10 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
      * So those fields can load the values from the correct/new api credentials and
      * validate the selected value against those.
      * Important for when changing API credentials in an existing exam.
+     *
+     * This is used to give api-dependent fields the correct API credentials.
+     * On editing, it will show give the previously selected API credentials,
+     * on selecting/changing it will give the new submitted ones.
      */
     public function definition_after_data() {
         $mform = $this->_form;
@@ -419,13 +440,17 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
             // Test if those api credentials exist, if not just don't select them.
             $apicredentials = api_credentials::get_by_id($apicredentialsvalue[0]);
             if ($apicredentials && $apicredentials->are_valid()) {
-                /** @var exam_modules_select $examselectfield */
-                $examselectfield = $mform->getElement('exam_module');
-                $examselectfield->set_api_credentials($apicredentials);
+                if ($mform->elementExists('exam_module')) {
+                    /** @var exam_modules_select $examselectfield */
+                    $examselectfield = $mform->getElement('exam_module');
+                    $examselectfield->set_api_credentials($apicredentials);
+                }
 
-                /** @var remote_proctor_select $remoteproctorselectfield */
-                $remoteproctorselectfield = $mform->getElement('remote_proctor');
-                $remoteproctorselectfield->set_api_credentials($apicredentials);
+                if ($mform->elementExists('remote_proctor')) {
+                    /** @var remote_proctor_select $remoteproctorselectfield */
+                    $remoteproctorselectfield = $mform->getElement('remote_proctor');
+                    $remoteproctorselectfield->set_api_credentials($apicredentials);
+                }
             }
         }
     }

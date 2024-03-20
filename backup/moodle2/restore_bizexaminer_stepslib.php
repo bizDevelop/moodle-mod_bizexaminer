@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-use mod_bizexaminer\data_objects\exam;
+use mod_bizexaminer\local\data_objects\exam;
 use mod_bizexaminer\util;
 
 /**
