@@ -18,13 +18,13 @@
  * Data object for an exam.
  *
  * @package     mod_bizexaminer
- * @category    data_objects
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_bizexaminer\local\data_objects;
 
+use coding_exception;
 use DateTime;
 use mod_bizexaminer\local\api\api_credentials;
 use mod_bizexaminer\local\api\exam_modules;
@@ -39,7 +39,10 @@ use stdClass;
  * @package mod_bizexaminer
  */
 class exam extends data_object {
-
+    /**
+     * The table name in the database (without moodle prefix).
+     * @var string
+     */
     public const TABLE = 'bizexaminer';
 
     /**
@@ -221,6 +224,11 @@ class exam extends data_object {
      */
     public ?string $apicredentials = null;
 
+    /**
+     * Build api_credentials from the chosen api credentials for this exam.
+     *
+     * @return null|api_credentials null if none selected or not valid/existing.
+     */
     public function get_api_credentials(): ?api_credentials {
         if (!$this->apicredentials) {
             return null;
@@ -286,6 +294,11 @@ class exam extends data_object {
         return true;
     }
 
+    /**
+     * Get the data_objects data as a moodle data object (eg for mod_form, database)
+     *
+     * @return stdClass
+     */
     public function get_data(): stdClass {
         $data = parent::get_data();
         $data->course = $this->course;
@@ -319,7 +332,13 @@ class exam extends data_object {
         return $data;
     }
 
-    public static function load_data(data_object $exam, \stdClass $data): void {
+    /**
+     * Loads data from a moodle data object (eg mod_form, database) into an instance of the data_object
+     *
+     * @param data_object $exam
+     * @param stdClass $data
+     */
+    public static function load_data(data_object $exam, stdClass $data): void {
         parent::load_data($exam, $data);
         $exam->course = $data->course ?? null;
         $exam->name = $data->name ?? '';
@@ -360,6 +379,15 @@ class exam extends data_object {
         return $this->get_data();
     }
 
+    /**
+     * Get a data object from the database
+     *
+     * @param int $id
+     * @param int $strictness IGNORE_MISSING means compatible mode, false returned if record not found, debug message if more found;
+     *                        IGNORE_MULTIPLE means return first, ignore multiple records found(not recommended);
+     *                        MUST_EXIST means we will throw an exception if no record or multiple records found.
+     * @return null|self
+     */
     public static function get(int $id, int $strictness = IGNORE_MISSING): ?data_object {
         $exam = parent::get($id);
         if ($exam && $exam->id) {
@@ -371,6 +399,12 @@ class exam extends data_object {
         return $exam;
     }
 
+    /**
+     * Save a data object to the database
+     *
+     * @param data_object $exam
+     * @return int|false
+     */
     public static function save(data_object $exam) {
         $saved = parent::save($exam);
         if ($saved) {
@@ -380,6 +414,12 @@ class exam extends data_object {
         return $saved && $updatedoptions && $updatedfeedbacks;
     }
 
+    /**
+     * Deletes an instance of the data_object from the database
+     *
+     * @param int $id
+     * @return bool
+     */
     public static function delete(int $id) {
         /** @var moodle_database $DB */ // phpcs:ignore moodle.Commenting.InlineComment.TypeHintingMatch
         global $DB;
@@ -440,7 +480,15 @@ class exam extends data_object {
 
         $optionvalues = [];
         foreach ($remoteproctoroptions as $option) {
-            $optionvalues[$option->optionkey] = $option->optionvalue;
+            $value = $option->optionvalue;
+            // Try to unserialize array values from repeaters.
+            if (str_starts_with($value, 'a:')) {
+                $unserializedvalue = @unserialize($value);
+                if ($unserializedvalue !== false) {
+                    $value = $unserializedvalue;
+                }
+            }
+            $optionvalues[$option->optionkey] = $value;
         }
 
         $exam->remoteproctoroptions = [$proctortype => $optionvalues];
@@ -481,7 +529,7 @@ class exam extends data_object {
                 $option->examid = (int)$exam->id;
                 $option->proctortype = $exam->remoteproctortype; // Comes from API, should be safe.
                 $option->optionkey = $fieldkey; // Comes from hardcoded values, should be safe.
-                $option->optionvalue = $value;
+                $option->optionvalue = is_array($value) ? @serialize($value) : $value;
 
                 $newoptions[] = $option;
             }

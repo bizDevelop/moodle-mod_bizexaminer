@@ -31,6 +31,11 @@ use mod_bizexaminer\util;
  */
 class restore_bizexaminer_activity_structure_step extends restore_activity_structure_step {
 
+    /**
+     * Define paths and structure of the mod backup.
+     *
+     * @return mixed
+     */
     protected function define_structure() {
         $paths = [];
         $userinfo = $this->get_setting_value('userinfo');
@@ -77,6 +82,12 @@ class restore_bizexaminer_activity_structure_step extends restore_activity_struc
         $this->set_mapping('exam', $oldid, $newitemid);
     }
 
+    /**
+     * Process proctor options for a single exam.
+     *
+     * @param stdClass|array $data
+     * @return void
+     */
     protected function process_exam_proctor_option($data) {
         global $DB;
 
@@ -89,6 +100,12 @@ class restore_bizexaminer_activity_structure_step extends restore_activity_struc
         $this->set_mapping('exam_proctor_option', $oldid, $newitemid);
     }
 
+    /**
+     * Process feedbacks for a single exam.
+     *
+     * @param stdClass|array $data
+     * @return void
+     */
     protected function process_exam_feedback($data) {
         global $DB;
 
@@ -101,6 +118,12 @@ class restore_bizexaminer_activity_structure_step extends restore_activity_struc
         $this->set_mapping('exam_feedback', $oldid, $newitemid, true); // Has related files.
     }
 
+    /**
+     * Process grades for a single exam.
+     *
+     * @param stdClass|array $data
+     * @return void
+     */
     protected function process_exam_grade($data) {
         global $DB;
 
@@ -115,6 +138,12 @@ class restore_bizexaminer_activity_structure_step extends restore_activity_struc
         $this->set_mapping('exam_grade', $oldid, $newitemid);
     }
 
+    /**
+     * Process attempts for a single exam.
+     *
+     * @param stdClass|array $data
+     * @return void
+     */
     protected function process_exam_attempt($data) {
         global $DB;
 
@@ -141,6 +170,12 @@ class restore_bizexaminer_activity_structure_step extends restore_activity_struc
         $this->set_mapping('exam_attempt', $oldid, $newitemid);
     }
 
+    /**
+     * Process attempt results for a single exam.
+     *
+     * @param stdClass|array $data
+     * @return void
+     */
     protected function process_exam_attempt_result($data) {
         global $DB;
 
@@ -155,6 +190,9 @@ class restore_bizexaminer_activity_structure_step extends restore_activity_struc
         $this->set_mapping('bizexaminer_attempt_result', $oldid, $newitemid);
     }
 
+    /**
+     * Add files (from richtext editors) after importing the exam.
+     */
     protected function after_execute() {
         parent::after_execute();
         // Add exam related files, no need to match by itemname (just internally handled context).

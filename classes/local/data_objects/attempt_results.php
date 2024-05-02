@@ -18,7 +18,6 @@
  * Data object for the results of a single attempt at an exam.
  *
  * @package     mod_bizexaminer
- * @category    data_objects
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,13 +27,17 @@ namespace mod_bizexaminer\local\data_objects;
 use DateTime;
 use mod_bizexaminer\data_object;
 use mod_bizexaminer\util;
+use stdClass;
 
 /**
  * DAO/DTO for the results of a single attempt at an exam.
  * @package mod_bizexaminer
  */
 class attempt_results extends data_object {
-
+    /**
+     * The table name in the database (without moodle prefix).
+     * @var string
+     */
     public const TABLE = 'bizexaminer_attempt_results';
 
     /**
@@ -99,7 +102,12 @@ class attempt_results extends data_object {
      */
     public ?string $certificateurl;
 
-    public function get_data(): \stdClass {
+    /**
+     * Get the data_objects data as a moodle data object (eg for mod_form, database)
+     *
+     * @return stdClass
+     */
+    public function get_data(): stdClass {
         $data = parent::get_data();
         $data->attemptid = $this->attemptid;
         $data->whenfinished = $this->whenfinished->getTimestamp();
@@ -115,7 +123,13 @@ class attempt_results extends data_object {
         return $data;
     }
 
-    public static function load_data(data_object $attemptresults, \stdClass $data): void {
+    /**
+     * Loads data from a moodle data object (eg mod_form, database) into an instance of the data_object
+     *
+     * @param data_object $attemptresults
+     * @param stdClass $data
+     */
+    public static function load_data(data_object $attemptresults, stdClass $data): void {
         parent::load_data($attemptresults, $data);
         $attemptresults->attemptid = $data->attemptid;
         $attemptresults->whenfinished = util::create_date($data->whenfinished);

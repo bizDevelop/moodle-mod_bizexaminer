@@ -24,6 +24,7 @@
 
 namespace mod_bizexaminer;
 
+use mod_bizexaminer\local\api\api_error;
 use moodle_exception;
 
 /**
@@ -41,6 +42,13 @@ class bizexaminer_exception extends moodle_exception {
     public $debuginfo = '';
 
     /**
+     * An api_error that triggered this exception.
+     *
+     * @var api_error|null
+     */
+    public ?api_error $apierror = null;
+
+    /**
      * Add aditional contextual data for debugging to the exception.
      *
      * @param array $data
@@ -56,5 +64,17 @@ class bizexaminer_exception extends moodle_exception {
         }
 
         $this->debuginfo .= implode(',', $additionalinfos) . ' ';
+    }
+
+    /**
+     * Set an api_error that triggered this exception
+     * and add it to debug info
+     *
+     * @param api_error $apierror
+     * @return void
+     */
+    public function set_error(api_error $apierror) {
+        $this->apierror = $apierror;
+        $this->add_debug_info(['api_error' => json_encode($apierror)]);
     }
 }

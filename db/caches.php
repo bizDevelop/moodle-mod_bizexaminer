@@ -18,7 +18,6 @@
  * Display information about all the mod_bizexaminer modules in the requested course.
  *
  * @package     mod_bizexaminer
- * @category    db
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

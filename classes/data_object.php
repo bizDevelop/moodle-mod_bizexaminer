@@ -18,7 +18,6 @@
  * Base data object for any objects stored in the database.
  *
  * @package     mod_bizexaminer
- * @category    data_objects
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -156,13 +155,14 @@ abstract class data_object {
      *
      * @see $DB->get_records
      *
-     * @param array $conditions optional array $fieldname=>requestedvalue with AND in between
-     * @param string $sort an order to sort the results in (optional, a valid SQL ORDER BY parameter).
-     * @param string $fields a comma separated list of fields to return (optional, by default
+     * @param array|null $conditions optional array $fieldname=>requestedvalue with AND in between
+     * @param array ...$args Any args passed directly to $DB->get_records
+     * string $args['sort'] an order to sort the results in (optional, a valid SQL ORDER BY parameter).
+     * string $args['fields'] a comma separated list of fields to return (optional, by default
      *   all fields are returned). The first field will be used as key for the
      *   array so must be a unique field such as 'id'.
-     * @param int $limitfrom return a subset of records, starting at this point (optional).
-     * @param int $limitnum return a subset comprising this many records in total (optional, required if $limitfrom is set).
+     * int $args['limitfrom'] return a subset of records, starting at this point (optional).
+     * int $args['limitnum'] return a subset comprising this many records in total (optional, required if $limitfrom is set).
      * @return static[] An array of Objects indexed by id.
      */
     public static function get_all(?array $conditions = [], ...$args): array {
@@ -199,7 +199,7 @@ abstract class data_object {
     /**
      * Save a data object to the database
      *
-     * @param static $dataobject
+     * @param self $dataobject
      * @return int|false
      */
     public static function save(self $dataobject) {
@@ -279,7 +279,7 @@ abstract class data_object {
     /**
      * Loads data from a moodle data object (eg mod_form, database) into an instance of the data_object
      *
-     * @param static $dataobject
+     * @param self $dataobject
      * @param stdClass $data
      */
     public static function load_data(self $dataobject, \stdClass $data) {

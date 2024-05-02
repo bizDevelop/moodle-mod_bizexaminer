@@ -18,7 +18,6 @@
  * Main Handler for the callback api
  *
  * @package     mod_bizexaminer
- * @category    callback_api
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -124,7 +123,7 @@ class callback_api {
         $exam = exam::get($examid);
         if (!$exam) {
             util::log('invalid examid passed to callback api (' . $examid . ')');
-            \core\notification::error(get_string('error_general', 'mod_bizexaminer'));
+            \core\notification::error(get_string('error_exam_not_found', 'mod_bizexaminer'));
             redirect(new moodle_url('/mod/bizexaminer/view.php', ['examid' => $examid]));
         }
 
@@ -148,6 +147,7 @@ class callback_api {
             }
             $examurl = $examsservice->start_attempt($exam, $userid);
             if (!$examurl) {
+                // A general error ocurred.
                 // Throw exception so catch block is triggered.
                 throw new bizexaminer_exception('error_general', 'mod_bizexaminer');
             }
@@ -157,6 +157,9 @@ class callback_api {
             $exception->add_debug_info(['examid' => $exam->id, 'userid' => $userid]);
             util::log_exception($exception);
             \core\notification::error(get_string('error_general', 'mod_bizexaminer'));
+            if ($exception->apierror) {
+                \core\notification::error($exception->apierror->get_message());
+            }
             redirect(new moodle_url('/mod/bizexaminer/view.php', ['examid' => $examid]));
         }
 

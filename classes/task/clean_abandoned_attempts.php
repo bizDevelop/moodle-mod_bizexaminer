@@ -18,13 +18,13 @@
  * Scheduled task to cleanup abandoned attempts.
  *
  * @package     mod_bizexaminer
- * @category    tasks
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_bizexaminer\task;
 
+use coding_exception;
 use mod_bizexaminer\local\data_objects\attempt;
 use mod_bizexaminer\util;
 use moodle_database;
@@ -35,12 +35,16 @@ use moodle_database;
  */
 class clean_abandoned_attempts extends \core\task\scheduled_task {
 
+    /**
+     * Get the label for the task for admin ui.
+     *
+     * @return string
+     */
     public function get_name() {
         return get_string('task_cleanup_abandoned', 'mod_bizexaminer');
     }
 
     /**
-     *
      * Abort off any overdue attempts.
      */
     public function execute() {

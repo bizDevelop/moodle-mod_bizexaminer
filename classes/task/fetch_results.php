@@ -18,13 +18,13 @@
  * Scheduled task to fetch results for a specific attempt.
  *
  * @package     mod_bizexaminer
- * @category    tasks
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_bizexaminer\task;
 
+use coding_exception;
 use mod_bizexaminer\local\api\exams;
 use mod_bizexaminer\bizexaminer;
 use mod_bizexaminer\bizexaminer_exception;
@@ -39,6 +39,15 @@ use mod_bizexaminer\local\data_objects\attempt;
  */
 class fetch_results extends \core\task\adhoc_task {
 
+    /**
+     * Create a new instance of the task.
+     *
+     * This sets the properties so that only one task will be queued at a time for a given attempt.
+     *
+     * @param int $attemptid
+     * @param int $userid
+     * @return self
+     */
     public static function instance(int $attemptid, int $userid) {
         $task = new self();
         $task->set_custom_data((object)[
@@ -48,6 +57,9 @@ class fetch_results extends \core\task\adhoc_task {
         return $task;
     }
 
+    /**
+     * Execute background fetching of results for a specific attempt.
+     */
     public function execute() {
         $data = $this->get_custom_data();
         if (empty($data->attemptid)) {
@@ -71,6 +83,5 @@ class fetch_results extends \core\task\adhoc_task {
             $exception->add_debug_info(['attemptid' , $attempt->id]);
             mtrace_exception($exception);
         }
-
     }
 }

@@ -40,6 +40,11 @@ use mod_bizexaminer\local\data_objects\exam;
 use mod_bizexaminer\local\gradebook\grading;
 use mod_bizexaminer\util;
 
+/**
+ * The mod_bizexaminer privacy provider.
+ *
+ * @package mod_bizexaminer\privacy
+ */
 class provider implements
     // This plugin has data.
     \core_privacy\local\metadata\provider,
@@ -53,7 +58,7 @@ class provider implements
     /**
      * Get the list of contexts that contain user information.
      *
-     * @param collection $items The collection to add metadata to.
+     * @param collection $collection The collection to add metadata to.
      * @return collection The array of metadata
      */
     public static function get_metadata(collection $collection): collection {

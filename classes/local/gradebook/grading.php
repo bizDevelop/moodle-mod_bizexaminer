@@ -18,7 +18,6 @@
  * Exam modules service/helper.
  *
  * @package     mod_bizexaminer
- * @category    gradebook
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -38,10 +37,28 @@ use stdClass;
  * @package mod_bizexaminer
  */
 class grading {
-
+    /**
+     * Grademethod "highest" - use best attempt to calculate grade.
+     * @var int
+     */
     public const GRADEHIGHEST = 1;
+
+    /**
+     * Grademethod "average" - use average of all attempts to calculate grade.
+     * @var int
+     */
     public const GRADEAVERAGE = 2;
+
+    /**
+     * Grademethod "first" - use first attempt to calculate grade.
+     * @var int
+     */
     public const GRADEFIRST = 3;
+
+    /**
+     * Grademethod "last" - use last attempt to calculate grade.
+     * @var int
+     */
     public const GRADELAST = 4;
 
     /**

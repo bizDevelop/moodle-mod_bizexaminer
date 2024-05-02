@@ -18,7 +18,6 @@
  * Api client
  *
  * @package     mod_bizexaminer
- * @category    api
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -57,6 +56,13 @@ class api_client {
      * @var api_credentials
      */
     protected api_credentials $apicredentials;
+
+    /**
+     * The last error that occurred during this request.
+     *
+     * @var api_error|null
+     */
+    public ?api_error $lasterror = null;
 
     /**
      * Creates a new api_client instance
@@ -188,6 +194,7 @@ class api_client {
 
         $result = $this->make_call('createBooking', $requestdata);
         $error = $this->handle_api_result_errors($result);
+
         if (!$error && $result->get_response_code() === api_result::STATUS_OK) {
             if ($result->is_success()) {
                 $response = $result->get_response();
@@ -361,6 +368,8 @@ class api_client {
      * @return false|api_error false if no error was matched, otherwise an api_error
      */
     protected function handle_api_result_errors($apiresult) {
+        $this->lasterror = null;
+
         // Somehow null was returned - eg another error happened somewhere.
         if (!$apiresult) {
             $error = new api_error(
@@ -368,6 +377,7 @@ class api_client {
                 'Api returned another error',
                 ['result' => $apiresult]
             );
+            $this->lasterror = $error;
             $this->log_error($error);
             return $error;
         }
@@ -376,6 +386,7 @@ class api_client {
         if (api_error::is_a($apiresult)) {
             /** @var api_error $error */
             $error = $apiresult;
+            $this->lasterror = $error;
             $this->log_error($error);
             return $apiresult;
         }
@@ -394,21 +405,21 @@ class api_client {
                 case 'keys_error':
                     $error = new api_error(
                         'bizexaminer-api-not-allowed',
-                        'Api returned not allowed',
+                        get_string('error_api_keys', 'mod_bizexaminer'),
                         ['result' => $apiresult]
                     );
                     break;
                 case 'inputdata_error':
                     $error = new api_error(
                         'bizexaminer-api-error',
-                        'Api returned another error',
+                        get_string('error_api_invalid_data', 'mod_bizexaminer'),
                         ['result' => $apiresult]
                     );
                     break;
                 case 'json-parsing-error':
                     $error = new api_error(
                         'bizexaminer-api-error',
-                        'Api returned malformed JSON',
+                        get_string('error_api_return_value', 'mod_bizexaminer'),
                         ['result' => $apiresult]
                     );
                     break;
@@ -419,14 +430,14 @@ class api_client {
             case api_result::STATUS_UNAUTHORIZED:
                 $error = new api_error(
                     'bizexaminer-api-not-allowed',
-                    'Api returned not allowed',
+                    get_string('error_api_keys', 'mod_bizexaminer'),
                     ['result' => $apiresult]
                 );
                 break;
             case api_result::STATUS_NOT_FOUND:
                 $error = new api_error(
                     'bizexaminer-api-not-found',
-                    "Requested Api url was not found.",
+                    get_string('error_api_url', 'mod_bizexaminer'),
                     ['result' => $apiresult]
                 );
                 break;
@@ -435,7 +446,7 @@ class api_client {
             default:
                 $error = new api_error(
                     'bizexaminer-api-error',
-                    'Api returned another error',
+                    get_string('error_api_error', 'mod_bizexaminer'),
                     ['result' => $apiresult]
                 );
                 break;
@@ -443,6 +454,7 @@ class api_client {
 
         if ($error) {
             $this->log_error($error);
+            $this->lasterror = $error;
             return $error;
         }
 
@@ -457,7 +469,6 @@ class api_client {
      * @return api_result|api_error
      */
     public function make_call($function, array $data = []) {
-
         $body = array_merge($data, [ // Overwrite fixed values.
             'function' => $function,
             'key_owner' => $this->apicredentials->get_owner_key(),
@@ -486,6 +497,12 @@ class api_client {
         return $apiresult;
     }
 
+    /**
+     * Log an api_error instance to debug log.
+     *
+     * @param api_error $error
+     * @return void
+     */
     protected function log_error(api_error $error) {
         util::log('API: ' . $error->get_message(), DEBUG_ALL);
     }

@@ -18,21 +18,18 @@
  * The main mod_bizexaminer configuration form.
  *
  * @package     mod_bizexaminer
- * @category    mod_form
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 use core_grades\component_gradeitems;
 use mod_bizexaminer\local\api\api_credentials;
-use mod_bizexaminer\local\api\remote_proctors;
 use mod_bizexaminer\bizexaminer;
 use mod_bizexaminer\local\data_objects\exam;
 use mod_bizexaminer\local\data_objects\exam_feedback;
 use mod_bizexaminer\local\gradebook\grading;
 use mod_bizexaminer\local\mod_form\exam_modules_select;
 use mod_bizexaminer\local\mod_form\mod_form_helper;
-use mod_bizexaminer\local\mod_form\remote_proctor_options_group;
 use mod_bizexaminer\local\mod_form\remote_proctor_select;
 
 defined('MOODLE_INTERNAL') || die();
@@ -79,6 +76,15 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
      */
     private ?exam $exam = null;
 
+    /**
+     * Create a new mod_form instance.
+     *
+     * @param mixed $current
+     * @param mixed $section
+     * @param mixed $cm
+     * @param mixed $course
+     * @return void
+     */
     public function __construct($current, $section, $cm, $course) {
         $this->modformhelper = new mod_form_helper();
         $this->exam = new exam();
@@ -118,6 +124,7 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
         // Adding the standard "intro" and "introformat" fields.
         $this->standard_intro_elements();
         $this->add_exam_fields();
+        $this->add_remote_proctor_fields();
         $this->add_grading_fields();
         $this->add_feedback_fields();
         $this->add_access_restriction_fields();
@@ -125,6 +132,11 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
+    /**
+     * Add exam module related fields.
+     *
+     * @return void
+     */
     private function add_exam_fields() {
         $mform = $this->_form;
         // BizExaminer Settings.
@@ -186,27 +198,17 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
         $mform->addElement('selectyesno', 'usebecertificate', get_string('modform_usebecertificate', 'mod_bizexaminer'));
         $mform->addHelpButton('usebecertificate', 'modform_usebecertificate', 'mod_bizexaminer');
 
-        // Do not pass api credentials, instead let define_after_data handle it.
-        // It will pass the most current value (currently submitted or previously saved).
-        $mform->addElement(new remote_proctor_select(
-            'remote_proctor', get_string('modform_remote_proctor', 'mod_bizexaminer'), []
-        ));
-        $mform->addHelpButton('remote_proctor', 'modform_remote_proctor', 'mod_bizexaminer');
-
         if ($this->exam->apicredentials) {
             // Disable api-dependent fields if no api credentials are selected.
             $mform->disabledIf('exam_module', 'api_credentials', 'noitemselected');
             $mform->disabledIf('exam_module', 'api_credentials', 'eq', '');
             $mform->disabledIf('usebecertificate', 'api_credentials', 'noitemselected');
             $mform->disabledIf('usebecertificate', 'api_credentials', 'eq', '');
-            $mform->disabledIf('remote_proctor', 'api_credentials', 'noitemselected');
-            $mform->disabledIf('remote_proctor', 'api_credentials', 'eq', '');
 
             // Disable api-dependent fields if different api credentials than previously selected are chosen.
             // User has to submit save_api_credentials button first.
             $mform->disabledIf('exam_module', 'api_credentials', 'neq', $this->exam->apicredentials);
             $mform->disabledIf('usebecertificate', 'api_credentials', 'neq', $this->exam->apicredentials);
-            $mform->disabledIf('remote_proctor', 'api_credentials', 'neq', $this->exam->apicredentials);
         } else {
             // If no api credentials are selected, we want to always hide the fields
             // so the user is forced to save the api credentials.
@@ -216,51 +218,58 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
             $mform->hideIf('usebecertificate', 'api_credentials', 'noitemselected');
             $mform->hideIf('usebecertificate', 'api_credentials', 'eq', '');
             $mform->hideIf('usebecertificate', 'api_credentials', 'neq', '');
-            $mform->hideIf('remote_proctor', 'api_credentials', 'noitemselected');
-            $mform->hideIf('remote_proctor', 'api_credentials', 'eq', '');
-            $mform->hideIf('remote_proctor', 'api_credentials', 'neq', '');
         }
-
-        $this->add_remote_proctor_fields();
     }
 
+    /**
+     * Add fields for remote proctoring.
+     *
+     * @return void
+     */
     private function add_remote_proctor_fields() {
         $mform = $this->_form;
 
-        if (!$this->exam) {
+        $mform->addElement(
+                'header', 'bizexaminer_remocte_proctor_header', get_string('modform_remote_proctor_header', 'mod_bizexaminer'));
+
+        // Do not pass api credentials, instead let define_after_data handle it.
+        // It will pass the most current value (currently submitted or previously saved).
+        $mform->addElement(new remote_proctor_select(
+            'remote_proctor', get_string('modform_remote_proctor', 'mod_bizexaminer'), []
+        ));
+        $mform->addHelpButton('remote_proctor', 'modform_remote_proctor', 'mod_bizexaminer');
+
+        if ($this->exam) {
+            if ($this->exam->apicredentials) {
+                // Disable api-dependent fields if no api credentials are selected.
+                $mform->disabledIf('remote_proctor', 'api_credentials', 'noitemselected');
+                $mform->disabledIf('remote_proctor', 'api_credentials', 'eq', '');
+
+                // Disable api-dependent fields if different api credentials than previously selected are chosen.
+                // User has to submit save_api_credentials button first.
+                $mform->disabledIf('remote_proctor', 'api_credentials', 'neq', $this->exam->apicredentials);
+            } else {
+                // If no api credentials are selected, we want to always hide the fields
+                // so the user is forced to save the api credentials.
+                $mform->hideIf('remote_proctor', 'api_credentials', 'noitemselected');
+                $mform->hideIf('remote_proctor', 'api_credentials', 'eq', '');
+                $mform->hideIf('remote_proctor', 'api_credentials', 'neq', '');
+            }
+        }
+
+        // If no proctor select, don't show any proctor settings.
+        if (!$mform->elementExists('remote_proctor')) {
             return;
         }
 
-        $remoteproctoroptions = $mform->getElement('remote_proctor')->get_remote_proctors();
-
-        foreach (remote_proctors::get_remote_proctor_setting_fields() as $proctor => $proctorfields) {
-            $groupname = "remote_proctor_options[{$proctor}]";
-            // Group custom element creates child elements and sets types.
-            // Use constructor directly to pass arguments - otherwise $proctorfields would be passed to onQuickFormEvent.
-            $mform->addElement(new remote_proctor_options_group($groupname, $proctor, $proctorfields));
-
-            // Hide this group if no remote proctor is selected
-            // or if any other remote proctors than those beloning to this proctor type
-            // are selected.
-            // Build select options per proctor
-            // for remote proctor settings to depend upon
-            // because the syntax does not allow wildcard checking.
-            $otherproctoroptions = array_reduce(array_keys($remoteproctoroptions), function($otheroptions, $option) use ($proctor) {
-                $optionproctor = explode('_-_', $option)[0];
-                if ($optionproctor && $optionproctor !== $proctor) {
-                    $otheroptions[] = $option;
-                }
-                return $otheroptions;
-            }, [0, '']); // 0 for default value
-            $mform->hideIf(
-                $groupname,
-                'remote_proctor',
-                'in',
-                $otherproctoroptions
-            );
-        }
+        $this->modformhelper->add_remote_proctor_fields($this, $mform, $this->exam);
     }
 
+    /**
+     * Add fields for grading.
+     *
+     * @return void
+     */
     private function add_grading_fields() {
         $mform = $this->_form;
         // Add standard grading elements.
@@ -282,6 +291,11 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
         $mform->hideIf('grademethod', 'attempts', 'eq', 1);
     }
 
+    /**
+     * Add fields for feedback texts.
+     *
+     * @return void
+     */
     private function add_feedback_fields() {
         $mform = $this->_form;
         $mform->addElement('header', 'overallfeedbackheading', get_string('overallfeedback', 'mod_bizexaminer'));
@@ -336,6 +350,11 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
         }
     }
 
+    /**
+     * Add fields related to restricting access to the exam.
+     *
+     * @return void
+     */
     private function add_access_restriction_fields() {
         $mform = $this->_form;
 
@@ -408,10 +427,9 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
      *
      * Only available on moodleform_mod.
      *
-     * @param array $default_values passed by reference
+     * @param array $defaultvalues passed by reference
      */
-    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore, Squiz.Scope.MethodScope.Missing
-    function data_preprocessing(&$defaultvalues) {
+    function data_preprocessing(&$defaultvalues) { // phpcs:ignore Squiz.Scope.MethodScope.Missing
         parent::data_preprocessing($defaultvalues);
 
         $this->modformhelper->load_values($defaultvalues);
@@ -446,15 +464,37 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
                     $examselectfield->set_api_credentials($apicredentials);
                 }
 
+                // Element could not exist, if there are not remote proctors configured for an account.
                 if ($mform->elementExists('remote_proctor')) {
                     /** @var remote_proctor_select $remoteproctorselectfield */
                     $remoteproctorselectfield = $mform->getElement('remote_proctor');
                     $remoteproctorselectfield->set_api_credentials($apicredentials);
+
+                    // If not remote proctors, hide select.
+                    $remoteproctoroptions = $remoteproctorselectfield->get_remote_proctors();
+                    if (empty($remoteproctoroptions)) {
+                        $mform->removeElement('bizexaminer_remocte_proctor_header');
+                        $mform->removeElement('remote_proctor');
+                    }
+                    $this->modformhelper->hide_remote_proctoring_fields($mform, $remoteproctoroptions);
                 }
+            } else {
+                if ($mform->elementExists('remote_proctor')) {
+                    $mform->removeElement('bizexaminer_remocte_proctor_header');
+                    $mform->removeElement('remote_proctor');
+                }
+                $this->modformhelper->hide_remote_proctoring_fields($mform, []);
             }
         }
     }
 
+    /**
+     * Verify and validate form input.
+     *
+     * @param mixed $data
+     * @param mixed $files
+     * @return void
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
@@ -482,6 +522,11 @@ class mod_bizexaminer_mod_form extends moodleform_mod {
         return $errors;
     }
 
+    /**
+     * Load existing feedbacks from the database.
+     *
+     * @return void
+     */
     private function load_feedbacks() {
         if ($this->_instance) {
             $this->feedbacks = exam_feedback::get_all(['examid' => $this->_instance], 'mingrade ASC');
@@ -515,16 +560,4 @@ MoodleQuickForm::registerElementType(
 
     // The class name of the element.
     remote_proctor_select::class
-);
-MoodleQuickForm::registerElementType(
-    // The custom element is named `course_competency_rule`.
-    // This is the element name used in the `addElement()` function.
-    'bizexaminer_remote_proctor_options_group',
-
-    // This is where it's definition is defined.
-    // This does not currently support class auto-loading.
-    "$CFG->dirroot/mod/bizexaminer/classes/mod_form/remote_proctor_options_group.php",
-
-    // The class name of the element.
-    remote_proctor_options_group::class
 );

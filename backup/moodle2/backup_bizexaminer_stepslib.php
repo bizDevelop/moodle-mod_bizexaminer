@@ -28,6 +28,11 @@
  */
 class backup_bizexaminer_activity_structure_step extends backup_questions_activity_structure_step {
 
+    /**
+     * Define paths and structure of the mod backup.
+     *
+     * @return mixed
+     */
     protected function define_structure() {
         // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
@@ -37,7 +42,7 @@ class backup_bizexaminer_activity_structure_step extends backup_questions_activi
             'remoteproctor', 'remoteproctortype', 'maxattempts', 'grademethod',
             'grade', 'password', 'subnet', 'delayattempt1', 'delayattempt2',
             'timeopen', 'timeclose', 'overduehandling', 'graceperiod', 'usebecertificate',
-            'apicredentials'
+            'apicredentials',
         ]);
 
         $proctoroptions = new backup_nested_element('proctor_options');

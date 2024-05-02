@@ -18,7 +18,6 @@
  * Plugin strings are defined here.
  *
  * @package     mod_bizexaminer
- * @category    lang
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,8 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Required strings.
-$string['pluginname'] = 'bizExaminer';
-$string['modulename'] = 'bizExaminer Exam';
+$string['modulename'] = 'bizExaminer exam';
 $string['modulename_help'] = 'The bizExaminer Exam activity enables a teacher to create exams that students can take in bizExaminer.
 
 The teacher can allow the exam to be attempted multiple times and a time limit may be set.
@@ -35,10 +33,10 @@ The teacher can allow the exam to be attempted multiple times and a time limit m
 Each attempt is marked automatically (or manually, depending on questions configured in bizExaminer), and the grade is recorded in the gradebook.
 
 An exam module must be configured in bizExaminer, remote proctor connections can be reused.';
-$string['modulenameplural'] = 'bizExaminer Exams';
+$string['modulenameplural'] = 'bizExaminer exams';
 $string['pluginadministration'] = 'bizExaminer administration';
+$string['pluginname'] = 'bizExaminer';
 
-// Strings from acces.php (capabilities).
 $string['bizexaminer:addinstance'] = 'Add a new exam';
 $string['bizexaminer:view'] = 'View an exam';
 $string['bizexaminer:attempt'] = 'Attempt an exam';
@@ -46,70 +44,65 @@ $string['bizexaminer:viewownattempt'] = 'View own attempt at an exam';
 $string['bizexaminer:viewanyattempt'] = 'View any attempts (by any user) at an exam';
 $string['bizexaminer:deleteanyattempt'] = 'Delete (any) attempt from a student';
 
-// Strings from index.php.
-
-// General error messages.
 $string['nocredentials'] = 'Please configure your API credentials.';
 
-// Strings from settings.php (settings).
 $string['settings_apicredentials'] = 'API credentials';
 $string['settings_apicredentials_desc'] = 'Configure your bizExaminer API credentials';
 $string['settings_apicredentials_id'] = 'Id';
 $string['settings_apicredentials_name'] = 'Name';
-$string['settings_apicredentials_name_row'] = 'Name for API Credentials set {$a}';
-$string['settings_apicredentials_instance'] = 'Instance Domain';
-$string['settings_apicredentials_instance_row'] = 'Instance Domain for API Credentials set {$a}';
-$string['settings_apicredentials_key_owner'] = 'API Key Owner';
-$string['settings_apicredentials_key_owner_row'] = 'API Key Owner  for API Credentials set {$a}';
-$string['settings_apicredentials_key_organisation'] = 'API Key Organisation';
-$string['settings_apicredentials_key_organisation_row'] = 'API Key Organisation for API Credentials set {$a}';
+$string['settings_apicredentials_name_row'] = 'Name for API credentials set {$a}';
+$string['settings_apicredentials_instance'] = 'Instance domain';
+$string['settings_apicredentials_instance_row'] = 'Instance domain for API credentials set {$a}';
+$string['settings_apicredentials_key_owner'] = 'API key owner';
+$string['settings_apicredentials_key_owner_row'] = 'API key owner for API credentials set {$a}';
+$string['settings_apicredentials_key_organisation'] = 'API key organisation';
+$string['settings_apicredentials_key_organisation_row'] = 'API key organisation for API credentials set {$a}';
 $string['settings_apicredentials_actions'] = 'Actions';
 $string['settings_apicredentials_infos'] = 'Infos';
 $string['settings_apicredentials_used_in_singular'] = 'Used in {$a} exam';
 $string['settings_apicredentials_used_in'] = 'Used in {$a} exams';
 $string['settings_apicredentials_actions_delete'] = 'Delete';
-$string['settings_apicredentials_actions_delete_disabled'] = 'API Credentials cannot be deleted, if they are still used in exams';
+$string['settings_apicredentials_actions_delete_disabled'] = 'API credentials cannot be deleted, if they are still used in exams';
 $string['settings_apicredentials_actions_test_disabled'] = 'Please save your changes before testing the credentials.';
 $string['settings_apicredentials_error_invalid'] = 'The API credentials you entered are empty, not valid or contain non-valid characters. Please check them again.';
 $string['settings_apicredentials_new_label'] = 'New';
 
-$string['apikeyowner'] = 'API Key Owner';
+$string['apikeyowner'] = 'API key owner';
 $string['apikeyowner_desc'] = 'The API key for the (content) owner.';
 
-$string['apikeyorganisation'] = 'API Key Organisation';
+$string['apikeyorganisation'] = 'API key organisation';
 $string['apikeyorganisation_desc'] = 'The API key for the organisation.';
 
-$string['apikeyinstance'] = 'Instance Domain';
+$string['apikeyinstance'] = 'Instance domain';
 $string['apikeyinstance_desc'] = 'The domain name of your bizExaminer instance (without https:// or path).';
 
 $string['configureapi'] = 'Configure API credentials';
 $string['testapi'] = 'Test credentials';
 $string['checktestapi'] = 'Test bizExaminer API credentials';
-$string['testapi_desc'] = 'Test the stored api credential settings.';
+$string['testapi_desc'] = 'Test the stored API credential settings.';
 $string['testapi_error'] = 'Testing of some API credentials was not successful.';
 $string['testapi_success'] = 'Testing the API credentials was successful.';
 $string['testapi_credentials_valid'] = 'Valid';
 $string['testapi_credentials_invalid'] = 'Invalid';
 
-// Strings from module form.
-$string['modform_api_credentials'] = 'API Credentials';
-$string['modform_api_credentials_help'] = 'Select API Credentials to connect to bizExaminer and then save. You can configure them in the Plugin Settings.';
-$string['modform_api_credentials_save'] = 'Save API Credentials';
-$string['modform_api_credentials_invalid'] = 'The credentials configured for this are not valid or do not exist.';
+$string['modform_api_credentials'] = 'API credentials';
+$string['modform_api_credentials_help'] = 'Select API credentials to connect to bizExaminer and then save. You can configure them in the Plugin Settings.';
+$string['modform_api_credentials_save'] = 'Save API credentials';
+$string['modform_api_credentials_invalid'] = 'The credentials configured for this exam are not valid or do not exist.';
 $string['modform_api_credentials_save_help'] = 'After choosing the API credentials save the form to reload and show available exam modules and remote proctor options.';
-$string['modform_exam_module'] = 'Exam Module';
+$string['modform_exam_module'] = 'Exam module';
 $string['modform_exam_module_help'] = 'Select an exam module and a content revision.';
 $string['exam_module_invalid'] = 'Please select a valid exam module.';
-$string['modform_exam_module_error'] = 'Fehler beim Laden der Exam Module. Überprüfen Sie bitte auch die API Zugangsdaten - Sie können diese in den Einstellungen testen.';
+$string['modform_exam_module_error'] = 'Error loading the exam module. make sure your API credentials are correct - you can test them at the options screen.';
 $string['modform_exam_module_none'] = 'No exam modules found. Please make sure you have created exams in bizExaminer.
 Also make sure your API credentials are correct - you can test them at the options screen.';
 $string['modform_usebecertificate'] = 'Use bizExaminer certificates.';
 $string['modform_usebecertificate_help'] = 'Enable this option to show users the certificate you designed/configured in bizExaminer.';
+$string['modform_remote_proctor_header'] = 'Remote proctoring';
 $string['modform_remote_proctor'] = 'Use remote proctoring';
 $string['modform_remote_proctor_help'] = 'Choose one of your configured remote proctoring services.';
 $string['modform_remote_proctor_invalid'] = 'Please select a valid remote proctor or "no".';
-$string['modform_remote_proctor_error'] = 'Error retrieving remote proctors. Please make sure your API credentials are correct -
-you can test them at the options screen.';
+$string['modform_remote_proctor_error'] = 'Error retrieving remote proctors. Please make sure your API credentials are correct - you can test them at the options screen.';
 $string['modform_remote_proctor_none'] = 'No remote proctors found. Please make sure you have configured remote proctor accounts.
 Also make sure your API credentials are correct - you can test them at the options screen.';
 
@@ -128,43 +121,53 @@ $string['modform_feedbacktext'] = 'Feedback';
 $string['modform_mingrade'] = 'Minimum grade';
 $string['modform_add_feedbacks'] = 'Add {no} more feedback fields';
 
-// Proctor settings.
-$string['modform_proctorexam_settings'] = 'Proctor Exam Settings';
-$string['modform_proctorexam_sessionType'] = 'Session Type';
+$string['modform_proctorexam_settings'] = 'Proctor Exam';
+$string['modform_proctorexam_sessionType'] = 'Session type';
 $string['modform_proctorexam_sessionType_classroom'] = 'Classroom';
-$string['modform_proctorexam_sessionType_record_review'] = 'Record Review';
-$string['modform_proctorexam_sessionType_live_proctoring'] = 'Live Proctoring';
+$string['modform_proctorexam_sessionType_record_review'] = 'Record review';
+$string['modform_proctorexam_sessionType_live_proctoring'] = 'Live proctoring';
 $string['modform_proctorexam_mobileCam'] = 'Use mobile camera';
 $string['modform_proctorexam_mobileCam_help'] = 'Use mobile camera as additional recording device';
 $string['modform_proctorexam_dontSendEmails'] = 'Do not send participant emails';
 $string['modform_proctorexam_examInfo'] = 'General instructions for the exam';
 $string['modform_proctorexam_examInfo_help'] = 'They are displayed before the student starts the exam.';
 $string['modform_proctorexam_individualInfo'] = 'Individual information for each student.';
-$string['modform_proctorexam_individualInfo_help'] = 'A personalized link to start the exam will be appended
-at the bottom using the the text from below.
-Alternatively, the <code>##start_exam##</code>
-placeholder can be used to control positioning of the link.';
+$string['modform_proctorexam_individualInfo_help'] = 'A personalized link to start the exam will be appended at the bottom using the the text from below. Alternatively, the <code>##start_exam##</code> placeholder can be used to control positioning of the link.';
 $string['modform_proctorexam_startExamLinkText'] = '»Start exam« link text';
 $string['modform_proctorexam_startExamLinkText_default'] = 'Start exam';
 
-$string['modform_examity_settings'] = 'Examity Settings';
+$string['modform_examity_settings'] = 'Examity';
 $string['modform_examity_courseId'] = 'ID of the course';
 $string['modform_examity_courseName'] = 'Name of the course';
 $string['modform_examity_instructorFirstName'] = 'First name of the instructor';
 $string['modform_examity_instructorLastName'] = 'Last name of the instructor';
 $string['modform_examity_instructorEmail'] = 'Email address of the instructor';
 $string['modform_examity_examName'] = 'Name of the exam';
-$string['modform_examity_examLevel'] = 'Session Type';
-$string['modform_examity_examLevel_live_auth'] = 'Live Authentication';
-$string['modform_examity_examLevel_auto_proctoring_premium'] = 'Automated Proctoring Premium';
-$string['modform_examity_examLevel_record_review'] = 'Record and Review Proctoring';
-$string['modform_examity_examLevel_live_proctoring'] = 'Live Proctoring';
-$string['modform_examity_examLevel_auto_auth'] = 'Auto-Authentication';
-$string['modform_examity_examLevel_auto_proctoring_standard'] = 'Automated Proctoring Standard';
+$string['modform_examity_examLevel'] = 'Session type';
+$string['modform_examity_examLevel_live_auth'] = 'Live authentication';
+$string['modform_examity_examLevel_auto_proctoring_premium'] = 'Automated proctoring premium';
+$string['modform_examity_examLevel_record_review'] = 'Record and review proctoring';
+$string['modform_examity_examLevel_live_proctoring'] = 'Live proctoring';
+$string['modform_examity_examLevel_auto_auth'] = 'Auto-authentication';
+$string['modform_examity_examLevel_auto_proctoring_standard'] = 'Automated proctoring standard';
 $string['modform_examity_examInstructions'] = 'Instructions for the student';
 $string['modform_examity_proctorInstructions'] = 'Instructions for the proctor';
 
-$string['modform_examus_settings'] = 'Alemira Settings';
+$string['modform_examity_v5_settings'] = 'Examity';
+$string['modform_examity_v5_courseCode'] = 'Code of the course';
+$string['modform_examity_v5_courseName'] = 'Name of the course';
+$string['modform_examity_v5_instructorFirstName'] = 'First name of the instructor';
+$string['modform_examity_v5_instructorLastName'] = 'Last name of the instructor';
+$string['modform_examity_v5_instructorEmail'] = 'Email address of the instructor';
+$string['modform_examity_v5_examName'] = 'Name of the exam';
+$string['modform_examity_v5_examSecurityLevel'] = 'Exam security level';
+$string['modform_examity_v5_examSecurityLevel_auto'] = 'Automated + audit';
+$string['modform_examity_v5_examSecurityLevel_live_proctoring'] = 'Live proctoring';
+$string['modform_examity_v5_examSecurityLevel_live_auth'] = 'Live authentication + audit';
+$string['modform_examity_v5_examSecurityLevel_automated'] = 'Automated';
+$string['modform_examity_v5_examSecurityLevel_automated_practice'] = 'Automated practice';
+
+$string['modform_examus_settings'] = 'Constructor';
 $string['modform_examus_language'] = 'Constructor UI language';
 $string['modform_examus_language_en'] = 'English';
 $string['modform_examus_language_ru'] = 'Russian';
@@ -172,12 +175,12 @@ $string['modform_examus_language_es'] = 'Spanish';
 $string['modform_examus_language_it'] = 'Italian';
 $string['modform_examus_language_ar'] = 'Arabic';
 $string['modform_examus_proctoring'] = 'Type';
-$string['modform_examus_proctoring_online'] = 'Live Proctoring';
-$string['modform_examus_proctoring_offline'] = 'Record and Post Exam Review';
+$string['modform_examus_proctoring_online'] = 'Live proctoring';
+$string['modform_examus_proctoring_offline'] = 'Record and post exam review';
 $string['modform_examus_identification'] = 'Identification';
 $string['modform_examus_identification_face'] = 'Face';
 $string['modform_examus_identification_passport'] = 'Passport';
-$string['modform_examus_identification_face_and_passport'] = 'Face and Passport';
+$string['modform_examus_identification_face_and_passport'] = 'Face and passport';
 $string['modform_examus_respondus'] = 'Use Respondus LockDown Browser';
 $string['modform_examus_respondus_help'] = 'Use Respondus LockDown Browser';
 $string['modform_examus_userAgreementUrl'] = 'User agreement URL (optional)';
@@ -204,7 +207,53 @@ $string['modform_proctorio_disableRightClick'] = 'Disable rightclick';
 $string['modform_proctorio_disableDownloads'] = 'Disable downloads';
 $string['modform_proctorio_disablePrinting'] = 'Disable printing';
 
-// Modform: Access restrictions.
+$string['modform_meazure_settings'] = 'Meazure Learning';
+$string['modform_meazure_sessionType'] = 'Type';
+$string['modform_meazure_sessionType_live'] = 'Live+';
+$string['modform_meazure_sessionType_record'] = 'Record+';
+$string['modform_meazure_dontNotifyTestTaker'] = 'Do not notifiy test taker';
+$string['modform_meazure_securityPreset'] = 'Security preset';
+$string['modform_meazure_securityPreset_low'] = 'Low';
+$string['modform_meazure_securityPreset_medium'] = 'Medium';
+$string['modform_meazure_securityPreset_high'] = 'High';
+$string['modform_meazure_allowedUrls'] = 'Allowed URLs';
+$string['modform_meazure_allowedUrls_add'] = 'Add allowed URL';
+$string['modform_meazure_allowedUrls_delete'] = 'Remove allowed URL';
+$string['modform_meazure_url'] = 'Allowed URL {no}';
+$string['modform_meazure_open_on_start'] = 'Open allowed URL {no} on start';
+$string['modform_meazure_allowedResources'] = 'Allowed resources';
+$string['modform_meazure_allowedResources_all_websites'] = 'All websites';
+$string['modform_meazure_allowedResources_approved_website'] = 'Approved website';
+$string['modform_meazure_allowedResources_bathroom_breaks'] = 'Bathroom breaks';
+$string['modform_meazure_allowedResources_computer_calculator'] = 'Computer\'s calculator';
+$string['modform_meazure_allowedResources_course_website'] = 'Course website';
+$string['modform_meazure_allowedResources_ebook_computer'] = 'Ebook (computer)';
+$string['modform_meazure_allowedResources_ebook_website'] = 'Ebook (website)';
+$string['modform_meazure_allowedResources_excel'] = 'Excel';
+$string['modform_meazure_allowedResources_excel_notes'] = 'Notes (Excel)';
+$string['modform_meazure_allowedResources_financial_calculator'] = 'Financial calculator';
+$string['modform_meazure_allowedResources_formula_sheet'] = 'Formula sheet';
+$string['modform_meazure_allowedResources_four_function_calculator'] = 'Four function calculator';
+$string['modform_meazure_allowedResources_graphing_calculator'] = 'Graphing calculator';
+$string['modform_meazure_allowedResources_handwritten_notes'] = 'Handwritten notes';
+$string['modform_meazure_allowedResources_note_cards'] = 'Note cards';
+$string['modform_meazure_allowedResources_notepad'] = 'Notepad';
+$string['modform_meazure_allowedResources_online_calculator'] = 'Online calculator';
+$string['modform_meazure_allowedResources_paint'] = 'Paint';
+$string['modform_meazure_allowedResources_pdf_notes'] = 'Notes (PDF)';
+$string['modform_meazure_allowedResources_powerpoint'] = 'Powerpoint';
+$string['modform_meazure_allowedResources_powerpoint_notes'] = 'Notes (Powerpoint)';
+$string['modform_meazure_allowedResources_printed_notes'] = 'Printed notes';
+$string['modform_meazure_allowedResources_scientific_calculator'] = 'Scientific calculator';
+$string['modform_meazure_allowedResources_scratch1'] = 'Scratch paper (1 sheet)';
+$string['modform_meazure_allowedResources_scratch2'] = 'Scratch paper (2 sheets)';
+$string['modform_meazure_allowedResources_scratch_more'] = 'Scratch paper (multiple sheets)';
+$string['modform_meazure_allowedResources_spss'] = 'SPSS';
+$string['modform_meazure_allowedResources_textbook'] = 'Textbook';
+$string['modform_meazure_allowedResources_whiteboard'] = 'Whiteboard';
+$string['modform_meazure_allowedResources_word'] = 'Word';
+$string['modform_meazure_allowedResources_word_notes'] = 'Notes (Word)';
+
 $string['modform_access_restrictions'] = 'Extra restrictions';
 $string['modform_access_restrictions_password'] = 'Require password';
 $string['modform_access_restrictions_password_help'] = 'If a password is specified, a student must enter it in order to attempt the exam. Must be 4-12 characters long.';
@@ -216,7 +265,7 @@ $string['modform_access_restrictions_delay1st2nd_help'] = 'If enabled, a student
 $string['modform_access_restrictions_delaylater'] = 'Enforced delay between later attempts';
 $string['modform_access_restrictions_delaylater_help'] = 'If enabled, a student must wait for the specified time to elapse before attempting the exam a third time and any subsequent times.';
 $string['modform_access_restrictions_timeopen'] = 'Open the exam';
-$string['modform_access_restrictions_timeopen_help'] = 'Students can only start their attempt(s) after the open time and they must complete their attempts before the close time.';;
+$string['modform_access_restrictions_timeopen_help'] = 'Students can only start their attempt(s) after the open time and they must complete their attempts before the close time.';
 $string['modform_access_restrictions_timeclose'] = 'Close the exam';
 $string['modform_access_restrictions_timeclose_error_beforopen'] = 'You have specified a close date before the open date.';
 $string['modform_access_restrictions_overduehandling'] = 'When time expires';
@@ -226,13 +275,11 @@ $string['modform_access_restrictions_overduehandling_autoabandon'] = 'Attempts m
 $string['modform_access_restrictions_overduehandling_graceperiod_field'] = 'Submission grace period';
 $string['modform_access_restrictions_overduehandling_graceperiod_field_help'] = 'If what to do when the time expires is set to \'There is a grace period...\', then this is the default amount of extra time that is allowed.';
 
-// Reset form.
 $string['resetform_remove_attempts'] = 'Delete all exam attempts';
 $string['reset_delete_attempts'] = 'Exam attempts deleted';
 $string['reset_delete_grades'] = 'Exam stored grades deleted';
 $string['reset_grades'] = 'Exam gradebook grades reset';
 
-// Exam view.
 $string['exam_startattempt'] = 'Start exam';
 $string['exam_retakeattempt'] = 'Retake exam';
 $string['exam_resumeattempt'] = 'Resume exam';
@@ -276,14 +323,12 @@ $string['attempt_status_aborted'] = 'Aborted';
 $string['attempt_status_date_started'] = 'Started {$a}';
 $string['attempt_status_date_completed'] = 'Completed {$a}';
 
-// Attempt view.
 $string['attempt_heading'] = 'Attempt for {$a}';
 $string['attempts'] = 'Attempts';
 $string['attempts_heading'] = 'Attempts for {$a}';
 $string['attempts_no'] = '{$a} attempts';
 $string['attempts_view_all'] = 'View all attempts';
 
-// Grading.
 $string['grade_infos'] = 'Grading';
 $string['grade_current'] = 'Your grade';
 $string['gradehighest'] = 'Highest grade';
@@ -292,7 +337,6 @@ $string['gradeattemptfirst'] = 'First attempt';
 $string['gradeattemptlast'] = 'Last attempt';
 $string['grade_pass_out_of'] = '{$a->gradepass} out of {$a->maxgrade}';
 
-// Results.
 $string['results_notification_passed'] = 'You have passed the exam.';
 $string['results_notification_not_passed'] = 'You have not passed the exam.';
 $string['results_whenstarted'] = 'Started on';
@@ -306,23 +350,25 @@ $string['results_questionscount'] = 'Questions';
 $string['results_questionscorrectcount'] = 'Correct questions';
 $string['results_grade_link'] = '<a href="{$a}">See grades</a>';
 
-// Callback API.
 $string['callbackapi_action'] = 'Callback API was called with an invalid action.';
 $string['callbackapi_invalidexam'] = 'An invalid exam id was passed to the callback API.';
 $string['callbackapi_invalidattempt'] = 'An invalid attempt id was passed to the callback API.';
 $string['callbackapi_invalidkey'] = 'Invalid key for attempt.';
 $string['callbackapi_differentuser'] = 'You are not loggedin as the user who took the exam.';
 
-// Tasks.
 $string['task_cleanup_abandoned'] = 'Aborting abandoned exam attempts';
 
-// General errors.
 $string['invalid_attempt_id'] = 'Invalid attempt id passed.';
 $string['invalid_exam_id'] = 'Invalid exam id passed.';
 $string['error_saving_exam'] = 'Error saving exam.';
 $string['error_general'] = 'Something went wrong. Please try again or contact admin/support.';
+$string['error_exam_not_found'] = 'Something went wrong. This exam does not exist (anymore).';
+$string['error_api_invalid_data'] = 'The data sent to bizExaminer was invalid and the exam could not be started.';
+$string['error_api_keys'] = 'The API keys for bizExaminer are invalid.';
+$string['error_api_url'] = 'The bizExaminer could not be found at the specified URL.';
+$string['error_api_return_value'] = 'bizExaminer returned an invalid value.';
+$string['error_api_error'] = 'bizExaminer could not handle the request.';
 
-// Privacy.
 $string['privacy:metadata:attempts'] = 'Details about each attempt on an exam.';
 $string['privacy:metadata:attempts:examid'] = 'The exam that was attempted.';
 $string['privacy:metadata:attempts:userid'] = 'The user who attempted the exam.';

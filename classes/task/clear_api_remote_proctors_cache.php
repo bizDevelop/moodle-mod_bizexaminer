@@ -18,7 +18,6 @@
  * Adhoc task to clear/purge the remote proctors fetched from api
  *
  * @package     mod_bizexaminer
- * @category    tasks
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,6 +25,7 @@
 namespace mod_bizexaminer\task;
 
 use cache;
+use coding_exception;
 
 /**
  * Adhoc task to clear/purge the remote proctors fetched from api.
@@ -38,6 +38,9 @@ use cache;
  */
 class clear_api_remote_proctors_cache extends \core\task\adhoc_task {
 
+    /**
+     * Execute clearing the cache.
+     */
     public function execute() {
         $remoteproctorscaceh = cache::make('mod_bizexaminer', 'remote_proctors');
         $remoteproctorscaceh->purge();

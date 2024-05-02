@@ -18,17 +18,18 @@
  * Api error
  *
  * @package     mod_bizexaminer
- * @category    api
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_bizexaminer\local\api;
 
+use JsonSerializable;
+
 /**
  * DTO for API errors
  */
-class api_error {
+class api_error implements JsonSerializable {
     /**
      * An internal error code
      * @var string
@@ -90,5 +91,17 @@ class api_error {
      */
     public static function is_a($mayberror): bool {
         return is_a($mayberror, self::class);
+    }
+
+    /**
+     * Return the data that should be used for json_encode.
+     *
+     * @return array
+     */
+    public function jsonSerialize(): array {
+        return array_merge([
+            'errorcode' => $this->errorcode,
+            'message' => $this->message,
+        ], $this->data ?? []);
     }
 }

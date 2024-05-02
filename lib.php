@@ -60,6 +60,16 @@ function bizexaminer_get_coursemodule_info($coursemodule) {
 }
 
 /**
+ * Whether the activity is branded.
+ * This information is used, for instance, to decide if a filter should be applied to the icon or not.
+ *
+ * @return bool True if the activity is branded, false otherwise.
+ */
+function bizexaminer_is_branded(): bool {
+    return true;
+}
+
+/**
  * Return if the plugin supports $feature.
  *
  * @param string $feature Constant representing the feature.

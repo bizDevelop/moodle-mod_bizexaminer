@@ -18,7 +18,6 @@
  * Data object for a grade at an exam.
  *
  * @package     mod_bizexaminer
- * @category    data_objects
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,13 +27,17 @@ namespace mod_bizexaminer\local\data_objects;
 use DateTime;
 use mod_bizexaminer\data_object;
 use mod_bizexaminer\util;
+use stdClass;
 
 /**
  * DAO/DTO for a grade at an exam.
  * @package mod_bizexaminer
  */
 class exam_grade extends data_object {
-
+    /**
+     * The table name in the database (without moodle prefix).
+     * @var string
+     */
     public const TABLE = 'bizexaminer_grades';
 
     /**
@@ -67,7 +70,12 @@ class exam_grade extends data_object {
      */
     public \DateTime $timesubmitted;
 
-    public function get_data(): \stdClass {
+    /**
+     * Get the data_objects data as a moodle data object (eg for mod_form, database)
+     *
+     * @return stdClass
+     */
+    public function get_data(): stdClass {
         $data = parent::get_data();
         $data->examid = $this->examid;
         $data->userid = $this->userid;
@@ -78,12 +86,18 @@ class exam_grade extends data_object {
         return $data;
     }
 
-    public static function load_data(data_object $attempt, \stdClass $data): void {
-        parent::load_data($attempt, $data);
-        $attempt->examid = $data->examid;
-        $attempt->userid = $data->userid;
-        $attempt->grade = $data->grade;
-        $attempt->timemodified = util::create_date($data->timemodified);
-        $attempt->timesubmitted = util::create_date($data->timesubmitted);
+    /**
+     * Loads data from a moodle data object (eg mod_form, database) into an instance of the data_object
+     *
+     * @param data_object $examgrade
+     * @param stdClass $data
+     */
+    public static function load_data(data_object $examgrade, stdClass $data): void {
+        parent::load_data($examgrade, $data);
+        $examgrade->examid = $data->examid;
+        $examgrade->userid = $data->userid;
+        $examgrade->grade = $data->grade;
+        $examgrade->timemodified = util::create_date($data->timemodified);
+        $examgrade->timesubmitted = util::create_date($data->timesubmitted);
     }
 }

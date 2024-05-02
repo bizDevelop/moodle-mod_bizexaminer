@@ -18,7 +18,6 @@
  * Data object for an attempt at an exam.
  *
  * @package     mod_bizexaminer
- * @category    data_objects
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,13 +30,17 @@ use mod_bizexaminer\bizexaminer;
 use mod_bizexaminer\data_object;
 use mod_bizexaminer\util;
 use moodle_url;
+use stdClass;
 
 /**
  * DAO/DTO for an attempt at an exam.
  * @package mod_bizexaminer
  */
 class attempt extends data_object {
-
+    /**
+     * The table name in the database (without moodle prefix).
+     * @var string
+     */
     public const TABLE = 'bizexaminer_attempts';
 
     /**
@@ -188,7 +191,12 @@ class attempt extends data_object {
         return $examurl ? new moodle_url($examurl) : false;
     }
 
-    public function get_data(): \stdClass {
+    /**
+     * Get the data_objects data as a moodle data object (eg for mod_form, database)
+     *
+     * @return stdClass
+     */
+    public function get_data(): stdClass {
         $data = parent::get_data();
         $data->examid = $this->examid;
         $data->userid = $this->userid;
@@ -205,7 +213,13 @@ class attempt extends data_object {
         return $data;
     }
 
-    public static function load_data(data_object $attempt, \stdClass $data): void {
+    /**
+     * Loads data from a moodle data object (eg mod_form, database) into an instance of the data_object
+     *
+     * @param data_object $attempt
+     * @param stdClass $data
+     */
+    public static function load_data(data_object $attempt, stdClass $data): void {
         parent::load_data($attempt, $data);
         $attempt->examid = $data->examid ?? null;
         $attempt->userid = $data->userid ?? null;
@@ -252,6 +266,12 @@ class attempt extends data_object {
         }
     }
 
+    /**
+     * Deletes an instance of the data_object from the database
+     *
+     * @param int $id
+     * @return bool
+     */
     public static function delete(int $id) {
         $deleted = parent::delete($id);
 
@@ -262,6 +282,14 @@ class attempt extends data_object {
         return $deleted;
     }
 
+    /**
+     * Delete multiple data objects from the database based on conditions
+     *
+     * @uses $DB->delete_records
+     *
+     * @param null|array $conditions
+     * @return bool
+     */
     public static function delete_all(?array $conditions = []): bool {
         /** @var moodle_database $DB */ // phpcs:ignore moodle.Commenting.InlineComment.TypeHintingMatch
         global $DB;

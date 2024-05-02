@@ -18,7 +18,6 @@
  * Select field with selectgroups for exam modules
  *
  * @package     mod_bizexaminer
- * @category    mod_form
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -96,7 +95,11 @@ class remote_proctor_select extends \MoodleQuickForm_select {
             $this->_options = [];
         }
 
-        $this->loadArray($this->get_remote_proctors());
+        $remoteproctoroptions = $this->get_remote_proctors();
+        $defaultoptions = [
+            '' => get_string('choosedots'),
+        ];
+        $this->loadArray(array_merge($defaultoptions, $remoteproctoroptions));
     }
 
     /**
@@ -105,9 +108,7 @@ class remote_proctor_select extends \MoodleQuickForm_select {
      * @return string[]
      */
     public function get_remote_proctors(): array {
-        $options = [
-            '' => get_string('choosedots'),
-        ];
+        $options = [];
 
         if (!$this->apicredentials || !$this->apicredentials->are_valid()) {
             return $options;
@@ -128,8 +129,7 @@ class remote_proctor_select extends \MoodleQuickForm_select {
         }
 
         if (empty($options) && !self::$fetchoptionserroradded) {
-            \core\notification::error(get_string('modform_remote_proctor_none', 'mod_bizexaminer'));
-            self::$fetchoptionserroradded = true;
+            return $options;
         }
 
         return $options;
@@ -161,10 +161,13 @@ class remote_proctor_select extends \MoodleQuickForm_select {
     /**
      * Check that the remote proctor exists
      *
+     * phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod
+     *
      * @param string $value Submitted value.
      * @return string|null Validation error message or null.
      */
-    public function validateSubmitValue($value) { // phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod
+    public function validateSubmitValue($value) {
+        // phpcs:enable
         if (!$this->apicredentials || !$this->apicredentials->are_valid()) {
             return get_string('modform_remote_proctor_invalid', 'mod_bizexaminer');
         }

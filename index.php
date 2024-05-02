@@ -42,7 +42,7 @@ $modulename = get_string('modulename', 'mod_bizexaminer');
 $PAGE->set_url(new moodle_url('/mod/bizexaminer/index.php', ['id' => $course->id]));
 $PAGE->navbar->add($modulenameplural);
 $PAGE->set_title(format_string($course->shortname.': ' . $modulenameplural));
-$PAGE->set_heading(format_string($course->fullname));
+$PAGE->set_heading($course->fullname);
 $PAGE->set_context($coursecontext);
 
 /** @var mod_bizexaminer\output\renderer $renderer */

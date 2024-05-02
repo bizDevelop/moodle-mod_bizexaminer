@@ -28,6 +28,7 @@ namespace mod_bizexaminer\local\admin;
 use admin_setting;
 use admin_setting_configpasswordunmask;
 use admin_setting_configtext;
+use coding_exception;
 use html_table;
 use html_table_cell;
 use html_writer;
@@ -66,6 +67,9 @@ class admin_setting_api_credentials extends \admin_setting {
      */
     private settings $settingsservice;
 
+    /**
+     * Create a new field instance.
+     */
     public function __construct() {
         parent::__construct(
             'mod_bizexaminer/apicredentials',
@@ -269,6 +273,12 @@ class admin_setting_api_credentials extends \admin_setting {
         return $saved ? '' : get_string('errorsetting', 'admin');
     }
 
+    /**
+     * Render the setting field.
+     *
+     * @param mixed $data
+     * @param string $query
+     */
     public function output_html($data, $query = '') {
         global $OUTPUT, $PAGE;
 
@@ -347,7 +357,7 @@ class admin_setting_api_credentials extends \admin_setting {
                     ['detail' => 'mod_bizexaminer_testapi']
                 ))->out(),
                 'data-action' => 'mod_bizexaminer/apisettings-test_button',
-                'data-disabled-message' => get_string('settings_apicredentials_actions_test_disabled', 'mod_bizexaminer')
+                'data-disabled-message' => get_string('settings_apicredentials_actions_test_disabled', 'mod_bizexaminer'),
             ]
         );
 
@@ -449,6 +459,12 @@ class admin_setting_api_credentials extends \admin_setting {
         return $row;
     }
 
+    /**
+     * Delete a single credential set from the database.
+     *
+     * @param string $id
+     * @return void
+     */
     private function delete_credential(string $id): void {
         // Delete old options from database.
         // Id will not be stored in id array in main option (see above).

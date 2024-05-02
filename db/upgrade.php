@@ -18,7 +18,6 @@
  * Plugin upgrade steps are defined here.
  *
  * @package     mod_bizexaminer
- * @category    db
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

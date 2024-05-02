@@ -18,7 +18,6 @@
  * Select field with selectgroups for exam modules
  *
  * @package     mod_bizexaminer
- * @category    mod_form
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -133,11 +132,13 @@ class exam_modules_select extends \MoodleQuickForm_selectgroups {
     /**
      * Check that the exam module exists
      *
+     * phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod -- name form QuickForm
+     *
      * @param string $value Submitted value.
      * @return string|null Validation error message or null if valid.
      */
-    // phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod -- name form QuickForm
     public function validateSubmitValue($value) {
+        //phpcs:enable
         if (!$this->apicredentials || !$this->apicredentials->are_valid()) {
             return get_string('exam_module_invalid', 'mod_bizexaminer');
         }

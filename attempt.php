@@ -59,7 +59,7 @@ $canattempt = has_capability('mod/bizexaminer:attempt', $context);
 
 // Initialize $PAGE.
 $PAGE->set_cacheable(false); // Prevent caching because of dynamic nature of this page.
-$PAGE->set_url('/mod/bizexaminer/attempt.php', array('attemptid' => $attempt->id));
+$PAGE->set_url('/mod/bizexaminer/attempt.php', ['attemptid' => $attempt->id]);
 $title = $course->shortname . ': ' . format_string($exam->name);
 $PAGE->set_title($title);
 $PAGE->set_heading(get_string('attempt_heading', 'mod_bizexaminer', format_string($exam->name)));

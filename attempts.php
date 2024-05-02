@@ -50,7 +50,7 @@ if (!has_any_capability(['mod/bizexaminer:viewanyattempt', 'mod/bizexaminer:view
 
 // Initialize $PAGE.
 $PAGE->set_cacheable(false); // Prevent caching because of dynamic nature of this page.
-$PAGE->set_url('/mod/bizexaminer/attempts.php', array('examid' => $exam->id));
+$PAGE->set_url('/mod/bizexaminer/attempts.php', ['examid' => $exam->id]);
 $title = $course->shortname . ': ' . format_string($exam->name);
 $PAGE->set_title($title);
 $PAGE->set_heading(get_string('attempts_heading', 'mod_bizexaminer', format_string($exam->name)));

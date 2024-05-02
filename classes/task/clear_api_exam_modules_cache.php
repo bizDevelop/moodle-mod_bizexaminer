@@ -18,7 +18,6 @@
  * Task to clear/purge the exam modules fetched from API.
  *
  * @package     mod_bizexaminer
- * @category    tasks
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,6 +25,7 @@
 namespace mod_bizexaminer\task;
 
 use cache;
+use coding_exception;
 
 /**
  * Adhoc task to clear/purge the exam modules fetched from api.
@@ -38,6 +38,11 @@ use cache;
  */
 class clear_api_exam_modules_cache extends \core\task\adhoc_task {
 
+    /**
+     * Execute clearing the cache.
+     *
+     * @return void
+     */
     public function execute() {
         $exammodulescache = cache::make('mod_bizexaminer', 'exam_modules');
         $exammodulescache->purge();

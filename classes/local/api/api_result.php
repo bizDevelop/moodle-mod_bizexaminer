@@ -18,25 +18,49 @@
  * Api result object
  *
  * @package     mod_bizexaminer
- * @category    api
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_bizexaminer\local\api;
 
+use JsonSerializable;
 use Psr\Http\Message\ResponseInterface;
 use stdClass;
 
 /**
  * DTO for results from the API
  */
-class api_result {
+class api_result implements JsonSerializable {
 
+    /**
+     * HTTP Status code for OK status
+     * @var int
+     */
     public const STATUS_OK = 200;
+
+    /**
+     * HTTP Status code for UNAUTHORIZED status
+     * @var int
+     */
     public const STATUS_UNAUTHORIZED = 401;
+
+    /**
+     * HTTP Status code for NOT_FOUND status
+     * @var int
+     */
     public const STATUS_NOT_FOUND = 404;
+
+    /**
+     * HTTP Status code for BAD_REQUEST status
+     * @var int
+     */
     public const STATUS_BAD_REQUEST = 400;
+
+    /**
+     * HTTP Status code for ERROR status
+     * @var int
+     */
     public const STATUS_ERROR = 500;
 
     /**
@@ -199,5 +223,23 @@ class api_result {
      */
     public function get_error_details() {
         return $this->errordetails;
+    }
+
+    /**
+     * Return the data that should be used for json_encode.
+     *
+     * @return array
+     */
+    public function jsonSerialize(): array {
+        return [
+            'requestfunction' => $this->requestfunction,
+            'responsecode' => $this->responsecode,
+            'body' => $this->body,
+            'success' => $this->success,
+            'response' => $this->response,
+            'errorcode' => $this->errorcode,
+            'errormessage' => $this->errormessage,
+            'errordetails' => $this->errordetails,
+        ];
     }
 }

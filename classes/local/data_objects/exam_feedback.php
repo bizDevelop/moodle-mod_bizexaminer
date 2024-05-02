@@ -18,7 +18,6 @@
  * Data object for feedback text.
  *
  * @package     mod_bizexaminer
- * @category    data_objects
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,13 +25,17 @@
 namespace mod_bizexaminer\local\data_objects;
 
 use mod_bizexaminer\data_object;
+use stdClass;
 
 /**
  * DAO/DTO for exam feedback texts
  * @package mod_bizexaminer
  */
 class exam_feedback extends data_object {
-
+    /**
+     * The table name in the database (without moodle prefix).
+     * @var string
+     */
     public const TABLE = 'bizexaminer_feedbacks';
 
     /**
@@ -59,7 +62,12 @@ class exam_feedback extends data_object {
      */
     public float $mingrade;
 
-    public function get_data(): \stdClass {
+    /**
+     * Get the data_objects data as a moodle data object (eg for mod_form, database)
+     *
+     * @return stdClass
+     */
+    public function get_data(): stdClass {
         $data = parent::get_data();
         $data->examid = $this->examid;
         $data->feedbacktext = $this->feedbacktext;
@@ -68,7 +76,13 @@ class exam_feedback extends data_object {
         return $data;
     }
 
-    public static function load_data(data_object $examfeedback, \stdClass $data): void {
+    /**
+     * Loads data from a moodle data object (eg mod_form, database) into an instance of the data_object
+     *
+     * @param data_object $examfeedback
+     * @param stdClass $data
+     */
+    public static function load_data(data_object $examfeedback, stdClass $data): void {
         parent::load_data($examfeedback, $data);
         $examfeedback->examid = $data->examid;
         $examfeedback->feedbacktext = $data->feedbacktext;

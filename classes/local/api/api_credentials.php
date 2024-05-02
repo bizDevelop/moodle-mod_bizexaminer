@@ -18,7 +18,6 @@
  * Api credentials object
  *
  * @package     mod_bizexaminer
- * @category    api
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -149,6 +148,10 @@ class api_credentials {
         return new api_client($this);
     }
 
+    /**
+     * Test if the credentials are valid.
+     * @return bool
+     */
     public function are_valid(): bool {
         return !empty($this->instance) && !empty($this->ownerkey) && !empty(($this->organisationkey));
     }
@@ -184,7 +187,7 @@ class api_credentials {
      * Get an array of all api credentials configured.
      * @return self[]
      */
-    public static function get_all() : array {
+    public static function get_all(): array {
         return bizexaminer::get_instance()->get_service('settings')->get_credentials();
     }
 

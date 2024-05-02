@@ -18,7 +18,6 @@
  * Remote proctors service.
  *
  * @package     mod_bizexaminer
- * @category    api
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -106,11 +105,14 @@ class remote_proctors extends abstract_api_service {
             case 'proctorio':
                 return 'Proctorio';
             case 'examity':
+            case 'examity_v5':
                 return 'Examity';
             case 'examus':
                 return 'Constructor';
             case 'proctorexam':
                 return 'ProctorExam';
+            case 'meazure':
+                return 'Meazure Learning';
         }
         return '';
     }
@@ -131,10 +133,52 @@ class remote_proctors extends abstract_api_service {
     }
 
     /**
+     * Do some reformatting of options
+     * because of differences in storing the settings and how the API expects them.
+     *
+     * @param string|null $proctortype
+     * @param array|null $remoteproctoroptions
+     * @return array
+     */
+    public static function build_remote_proctor_options_for_api(
+        ?string $proctortype = null, ?array $remoteproctoroptions = []): array {
+        if (!$proctortype || empty($remoteproctoroptions)) {
+            return [];
+        }
+
+        if (!array_key_exists($proctortype, $remoteproctoroptions)) {
+            return [];
+        }
+
+        $options = $remoteproctoroptions[$proctortype];
+        if ($proctortype === 'meazure') {
+            $allowedurls = [];
+            if (!empty($options['allowedUrls']['url'])) {
+                foreach ($options['allowedUrls']['url'] as $i => $url) {
+                    $openonstart = false;
+                    if (!empty($options['allowedUrls']['open_on_start'][$i]) &&
+                        (int)$options['allowedUrls']['open_on_start'][$i] === 1) {
+                        $openonstart = true;
+                    };
+                    if (!empty($url)) {
+                        $allowedurls[] = [
+                            'url' => $url,
+                            'open_on_start' => $openonstart,
+                        ];
+                    }
+                }
+            }
+            $options['allowedUrls'] = $allowedurls;
+        }
+
+        return $options;
+    }
+
+    /**
      * Gets the settings per remote proctor to use
      * can be used for moodle plugin settings field format
      *
-     * @see mod_bizexaminer\mod_form\remote_proctor_options_group
+     * @see mod_bizexaminer\local\mod_form\mod_form_helper::add_remote_proctor_fields
      *
      * @return array
      */
@@ -142,7 +186,6 @@ class remote_proctors extends abstract_api_service {
         $settings = [
             'proctorexam' => [ // Key needs to be the same as 'type' from api.
                 'sessionType' => [
-                    'label' => get_string('modform_proctorexam_sessionType', 'mod_bizexaminer', null, true),
                     'type' => 'select',
                     'default' => 'record_review',
                     'options' => [
@@ -155,59 +198,47 @@ class remote_proctors extends abstract_api_service {
                     ],
                 ],
                 'mobileCam' => [
-                    'label' => get_string('modform_proctorexam_mobileCam', 'mod_bizexaminer', null, true),
-                    'help_text' => get_string('modform_proctorexam_mobileCam_help', 'mod_bizexaminer', null, true),
+                    'help_text' => true,
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'dontSendEmails' => [
-                    'label' => get_string('modform_proctorexam_dontSendEmails', 'mod_bizexaminer', null, true),
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'examInfo' => [
-                    'label' => get_string('modform_proctorexam_examInfo', 'mod_bizexaminer', null, true),
-                    'help_text' => get_string('modform_proctorexam_examInfo_help', 'mod_bizexaminer', null, true),
+                    'help_text' => true,
                     'type' => 'text',
                 ],
                 'individualInfo' => [
-                    'label' => get_string('modform_proctorexam_individualInfo', 'mod_bizexaminer', null, true),
-                    'help_text' => get_string('modform_proctorexam_individualInfo_help', 'mod_bizexaminer', null, true),
+                    'help_text' => true,
                     'type' => 'text',
                 ],
                 'startExamLinkText' => [
-                    'label' => get_string('modform_proctorexam_startExamLinkText', 'mod_bizexaminer'),
                     'default' => get_string('modform_proctorexam_startExamLinkText_default', 'mod_bizexaminer'),
                     'type' => 'text',
                 ],
             ],
             'examity' => [
                 'courseId' => [
-                    'label' => get_string('modform_examity_courseId', 'mod_bizexaminer', null, true),
                     'type' => 'text',
                 ],
                 'courseName' => [
-                    'label' => get_string('modform_examity_courseName', 'mod_bizexaminer', null, true),
                     'type' => 'text',
                 ],
                 'instructorFirstName' => [
-                    'label' => get_string('modform_examity_instructorFirstName', 'mod_bizexaminer', null, true),
                     'type' => 'text',
                 ],
                 'instructorLastName' => [
-                    'label' => get_string('modform_examity_instructorLastName', 'mod_bizexaminer', null, true),
                     'type' => 'text',
                 ],
                 'instructorEmail' => [
-                    'label' => get_string('modform_examity_instructorEmail', 'mod_bizexaminer', null, true),
                     'type' => 'email',
                 ],
                 'examName' => [
-                    'label' => get_string('modform_examity_examName', 'mod_bizexaminer', null, true),
                     'type' => 'text',
                 ],
                 'examLevel' => [
-                    'label' => get_string('modform_examity_examLevel', 'mod_bizexaminer', null, true),
                     'type' => 'select',
                     'value_type' => 'int',
                     'options' => [
@@ -220,17 +251,45 @@ class remote_proctors extends abstract_api_service {
                     ],
                 ],
                 'examInstructions' => [
-                    'label' => get_string('modform_examity_examInstructions', 'mod_bizexaminer', null, true),
                     'type' => 'text',
                 ],
                 'proctorInstructions' => [
-                    'label' => get_string('modform_examity_proctorInstructions', 'mod_bizexaminer', null, true),
                     'type' => 'text',
+                ],
+            ],
+            'examity_v5' => [
+                'courseCode' => [
+                    'type' => 'text',
+                ],
+                'courseName' => [
+                    'type' => 'text',
+                ],
+                'instructorFirstName' => [
+                    'type' => 'text',
+                ],
+                'instructorLastName' => [
+                    'type' => 'text',
+                ],
+                'instructorEmail' => [
+                    'type' => 'email',
+                ],
+                'examName' => [
+                    'type' => 'text',
+                ],
+                'examSecurityLevel' => [
+                    'type' => 'select',
+                    'value_type' => 'int',
+                    'options' => [
+                        2 => get_string('modform_examity_v5_examSecurityLevel_auto', 'mod_bizexaminer', null, true),
+                        4 => get_string('modform_examity_v5_examSecurityLevel_live_proctoring', 'mod_bizexaminer', null, true),
+                        10 => get_string('modform_examity_v5_examSecurityLevel_live_auth', 'mod_bizexaminer', null, true),
+                        11 => get_string('modform_examity_v5_examSecurityLevel_automated', 'mod_bizexaminer', null, true),
+                        12 => get_string('modform_examity_v5_examSecurityLevel_automated_practice', 'mod_bizexaminer', null, true),
+                    ],
                 ],
             ],
             'examus' => [
                 'language' => [
-                    'label' => get_string('modform_examus_language', 'mod_bizexaminer', null, true),
                     'type' => 'select',
                     'default' => 'en',
                     'options' => [
@@ -242,7 +301,6 @@ class remote_proctors extends abstract_api_service {
                     ],
                 ],
                 'proctoring' => [
-                    'label' => get_string('modform_examus_proctoring', 'mod_bizexaminer', null, true),
                     'type' => 'select',
                     'default' => 'online',
                     'options' => [
@@ -251,7 +309,6 @@ class remote_proctors extends abstract_api_service {
                     ],
                 ],
                 'identification' => [
-                    'label' => get_string('modform_examus_identification', 'mod_bizexaminer', null, true),
                     'type' => 'select',
                     'default' => 'face',
                     'options' => [
@@ -262,41 +319,34 @@ class remote_proctors extends abstract_api_service {
                     ],
                 ],
                 'respondus' => [
-                    'label' => get_string('modform_examus_respondus', 'mod_bizexaminer', null, true),
-                    'help_text' => get_string('modform_examus_respondus_help', 'mod_bizexaminer', null, true),
+                    'help_text' => true,
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'userAgreementUrl' => [
-                    'label' => get_string('modform_examus_userAgreementUrl', 'mod_bizexaminer', null, true),
                     'type' => 'text',
                     'default' => '',
                 ],
             ],
             'proctorio' => [
                 'recordVideo' => [
-                    'label' => get_string('modform_proctorio_recordVideo', 'mod_bizexaminer', null, true),
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'recordAudio' => [
-                    'label' => get_string('modform_proctorio_recordAudio', 'mod_bizexaminer', null, true),
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'recordScreen' => [
-                    'label' => get_string('modform_proctorio_recordScreen', 'mod_bizexaminer', null, true),
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'recordRoomStart' => [
-                    'label' => get_string('modform_proctorio_recordRoomStart', 'mod_bizexaminer', null, true),
-                    'help_text' => get_string('modform_proctorio_recordRoomStart_help', 'mod_bizexaminer', null, true),
+                    'help_text' => true,
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'verifyIdMode' => [
-                    'label' => get_string('modform_proctorio_verifyIdMode', 'mod_bizexaminer', null, true),
                     'type' => 'select',
                     'options' => [
                         '' => get_string('modform_proctorio_verifyIdMode_no', 'mod_bizexaminer', null, true),
@@ -305,17 +355,14 @@ class remote_proctors extends abstract_api_service {
                     ],
                 ],
                 'closeOpenTabs' => [
-                    'label' => get_string('modform_proctorio_closeOpenTabs', 'mod_bizexaminer', null, true),
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'allowNewTabs' => [
-                    'label' => get_string('modform_proctorio_allowNewTabs', 'mod_bizexaminer', null, true),
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'fullscreenMode' => [
-                    'label' => get_string('modform_proctorio_fullscreenMode', 'mod_bizexaminer', null, true),
                     'type' => 'select',
                     'options' => [
                         '' => get_string('modform_proctorio_fullscreenMode_no', 'mod_bizexaminer', null, true),
@@ -325,24 +372,135 @@ class remote_proctors extends abstract_api_service {
                     ],
                 ],
                 'disableClipboard' => [
-                    'label' => get_string('modform_proctorio_disableClipboard', 'mod_bizexaminer', null, true),
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'disableRightClick' => [
-                    'label' => get_string('modform_proctorio_disableRightClick', 'mod_bizexaminer', null, true),
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'disableDownloads' => [
-                    'label' => get_string('modform_proctorio_disableDownloads', 'mod_bizexaminer', null, true),
                     'type' => 'switch',
                     'default' => 0,
                 ],
                 'disablePrinting' => [
-                    'label' => get_string('modform_proctorio_disablePrinting', 'mod_bizexaminer', null, true),
                     'type' => 'switch',
                     'default' => 0,
+                ],
+            ],
+            'meazure' => [
+                'sessionType' => [
+                    'type' => 'select',
+                    'default' => 'live+',
+                    'options' => [
+                        'live+' => get_string(
+                            'modform_meazure_sessionType_live', 'mod_bizexaminer', null, true),
+                        'record+' => get_string(
+                            'modform_meazure_sessionType_record', 'mod_bizexaminer', null, true),
+                    ],
+                ],
+                'dontNotifyTestTaker' => [
+                    'type' => 'switch',
+                    'default' => 0,
+                ],
+                'securityPreset' => [
+                    'type' => 'select',
+                    'default' => 'low',
+                    'options' => [
+                        'low' => get_string(
+                            'modform_meazure_securityPreset_low', 'mod_bizexaminer', null, true),
+                        'medium' => get_string(
+                            'modform_meazure_securityPreset_medium', 'mod_bizexaminer', null, true),
+                        'high' => get_string(
+                            'modform_meazure_securityPreset_high', 'mod_bizexaminer', null, true),
+                    ],
+                ],
+                'allowedResources' => [
+                    'type' => 'select',
+                    'multiple' => true,
+                    'default' => [],
+                    'options' => [
+                        'all_websites' => get_string(
+                            'modform_meazure_allowedResources_all_websites', 'mod_bizexaminer', null, true),
+                        'approved_website' => get_string(
+                            'modform_meazure_allowedResources_approved_website', 'mod_bizexaminer', null, true),
+                        'bathroom_breaks' => get_string(
+                            'modform_meazure_allowedResources_bathroom_breaks', 'mod_bizexaminer', null, true),
+                        'computer_calculator' => get_string(
+                            'modform_meazure_allowedResources_computer_calculator', 'mod_bizexaminer', null, true),
+                        'course_website' => get_string(
+                            'modform_meazure_allowedResources_course_website', 'mod_bizexaminer', null, true),
+                        'ebook_computer' => get_string(
+                            'modform_meazure_allowedResources_ebook_computer', 'mod_bizexaminer', null, true),
+                        'ebook_website'     => get_string(
+                            'modform_meazure_allowedResources_ebook_website', 'mod_bizexaminer', null, true),
+                        'excel' => get_string(
+                            'modform_meazure_allowedResources_excel', 'mod_bizexaminer', null, true),
+                        'excel_notes' => get_string(
+                            'modform_meazure_allowedResources_excel_notes', 'mod_bizexaminer', null, true),
+                        'financial_calculator' => get_string(
+                            'modform_meazure_allowedResources_financial_calculator', 'mod_bizexaminer', null, true),
+                        'formula_sheet' => get_string(
+                            'modform_meazure_allowedResources_formula_sheet', 'mod_bizexaminer', null, true),
+                        'four_function_calculator' => get_string(
+                            'modform_meazure_allowedResources_four_function_calculator', 'mod_bizexaminer', null, true),
+                        'graphing_calculator' => get_string(
+                            'modform_meazure_allowedResources_graphing_calculator', 'mod_bizexaminer', null, true),
+                        'handwritten_notes' => get_string(
+                            'modform_meazure_allowedResources_handwritten_notes', 'mod_bizexaminer', null, true),
+                        'note_cards' => get_string(
+                            'modform_meazure_allowedResources_note_cards', 'mod_bizexaminer', null, true),
+                        'notepad' => get_string(
+                            'modform_meazure_allowedResources_notepad', 'mod_bizexaminer', null, true),
+                        'online_calculator' => get_string(
+                            'modform_meazure_allowedResources_online_calculator', 'mod_bizexaminer', null, true),
+                        'paint' => get_string(
+                            'modform_meazure_allowedResources_paint', 'mod_bizexaminer', null, true),
+                        'pdf_notes' => get_string(
+                            'modform_meazure_allowedResources_pdf_notes', 'mod_bizexaminer', null, true),
+                        'powerpoint' => get_string(
+                            'modform_meazure_allowedResources_powerpoint', 'mod_bizexaminer', null, true),
+                        'powerpoint_notes' => get_string(
+                            'modform_meazure_allowedResources_powerpoint_notes', 'mod_bizexaminer', null, true),
+                        'printed_notes' => get_string(
+                            'modform_meazure_allowedResources_printed_notes', 'mod_bizexaminer', null, true),
+                        'scientific_calculator' => get_string(
+                            'modform_meazure_allowedResources_scientific_calculator', 'mod_bizexaminer', null, true),
+                        'scratch1' => get_string(
+                            'modform_meazure_allowedResources_scratch1', 'mod_bizexaminer', null, true),
+                        'scratch2' => get_string(
+                            'modform_meazure_allowedResources_scratch2', 'mod_bizexaminer', null, true),
+                        'scratch_more' => get_string(
+                            'modform_meazure_allowedResources_scratch_more', 'mod_bizexaminer', null, true),
+                        'spss' => get_string(
+                            'modform_meazure_allowedResources_spss', 'mod_bizexaminer', null, true),
+                        'textbook' => get_string(
+                            'modform_meazure_allowedResources_textbook', 'mod_bizexaminer', null, true),
+                        'whiteboard' => get_string(
+                            'modform_meazure_allowedResources_whiteboard', 'mod_bizexaminer', null, true),
+                        'word' => get_string(
+                            'modform_meazure_allowedResources_word', 'mod_bizexaminer', null, true),
+                        'word_notes' => get_string(
+                            'modform_meazure_allowedResources_word_notes', 'mod_bizexaminer', null, true),
+                    ],
+                ],
+                'allowedUrls' => [
+                    'type' => 'repeater',
+                    'addlabel' => get_string('modform_meazure_allowedUrls_add', 'mod_bizexaminer', null, true),
+                    'deletelabel' => get_string('modform_meazure_allowedUrls_delete', 'mod_bizexaminer', null, true),
+                    'default' => '',
+                    'fields' => [
+                        'url' => [
+                            'type' => 'text',
+                            'default' => '',
+                            'sanitizetype' => PARAM_URL,
+                        ],
+                        'open_on_start' => [
+                            'type' => 'switch',
+                            'default' => 0,
+                            'sanitizetype' => PARAM_BOOL,
+                        ],
+                    ],
                 ],
             ],
         ];

@@ -18,7 +18,6 @@
  * Main exam service.
  *
  * @package     mod_bizexaminer
- * @category    api
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -216,7 +215,7 @@ class exams extends abstract_api_service {
             $returnurl,
             $callbackurl,
             $exam->remoteproctor,
-            $exam->remoteproctoroptions[$exam->remoteproctortype] ?? [],
+            remote_proctors::build_remote_proctor_options_for_api($exam->remoteproctortype, $exam->remoteproctoroptions),
             util::get_lang(),
             $validstart,
             $validend,
@@ -224,7 +223,11 @@ class exams extends abstract_api_service {
         );
 
         if (!$booking) {
-            throw new bizexaminer_exception('exam_error_booking', 'mod_bizexaminer');
+            $exception = new bizexaminer_exception('exam_error_booking', 'mod_bizexaminer');
+            if ($api->lasterror) {
+                $exception->set_error($api->lasterror);
+            }
+            throw $exception;
         }
 
         // 6. Save booking infos in attempt.

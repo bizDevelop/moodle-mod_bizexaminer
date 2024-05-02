@@ -1,76 +1,92 @@
 /* mod_form styling of nested remote proctor options */
-#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"]>fieldset>div {
-  flex-direction: column;
-  align-items: flex-start !important;
+/* stylelint-disable max-line-length */
+#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"] > fieldset > div {
+    /* stylelint-enable */
+    flex-direction: column;
+    /* stylelint-disable declaration-no-important  */
+    align-items: flex-start !important;
+    /* stylelint-enable */
 }
 
 /* simulate col-md styles for form */
-#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"]>fieldset>div>.form-group .col-form-label {
-  flex: 0 0 33%;
-  max-width: 33%;
-  display: block;
-  padding-left: 0;
+/* stylelint-disable max-line-length */
+#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"] > fieldset > div > .form-group .col-form-label {
+    /* stylelint-enable */
+    flex: 0 0 33%;
+    max-width: 33%;
+    display: block;
+    padding-left: 0;
 }
 
-#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"]>fieldset>div>.form-group [data-fieldtype] {
-  flex: 0 0 66%;
-  max-width: 66%;
+/* stylelint-disable max-line-length */
+#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"] > fieldset > div > .form-group [data-fieldtype] {
+    /* stylelint-enable */
+    flex: 0 0 66%;
+    max-width: 66%;
 }
 
-#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"]>fieldset>div>.form-group .form-control-feedback {
-  flex: 0 0 100%;
+/* stylelint-disable max-line-length */
+#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"] > fieldset > div > .form-group .form-control-feedback {
+    /* stylelint-enable */
+    flex: 0 0 100%;
 }
 
-#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"]>fieldset>div>.form-group {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  flex: 0 0 100%;
-  width: 100%;
-  justify-content: flex-start;
+/* stylelint-disable max-line-length */
+#id_bizexaminercontainer [data-groupname^="remote_proctor_options"] [data-fieldtype="group"] > fieldset > div > .form-group {
+    /* stylelint-enable */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: 0 0 100%;
+    width: 100%;
+    justify-content: flex-start;
 }
 
 /* view.php attempts table */
 .path-mod-bizexaminer .examattemptssummary .statedetails {
-  display: block;
-  font-size: 0.9em;
+    display: block;
+    font-size: 0.9em;
 }
 
 .path-mod-bizexaminer table.examattemptresults th.cell {
-  padding: 1px 0.5em 1px 1em;
-  font-weight: bold;
-  text-align: right;
-  width: 10em;
-  background: #f0f0f0;
+    padding: 1px 0.5em 1px 1em;
+    font-weight: bold;
+    text-align: right;
+    width: 10em;
+    background: #f0f0f0;
 }
 
 .path-mod-bizexaminer table.examattemptresults td.cell {
-  padding: 1px 1em 1px 0.5em;
-  text-align: left;
-  background: #fafafa;
+    padding: 1px 1em 1px 0.5em;
+    text-align: left;
+    background: #fafafa;
 }
 
 /* settings.php api credentials table */
 body.path-admin table.bizexaminer_api_credentials .form-shortname,
 body.path-admin table.bizexaminer_api_credentials .form-defaultinfo {
-  display: none !important;
+    /* stylelint-disable declaration-no-important  */
+    display: none !important;
+    /* stylelint-enable */
 }
 
 body.path-admin table.bizexaminer_api_credentials .form-label {
-  width: 0 !important;
-  flex: 0 0 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
+    /* stylelint-disable declaration-no-important  */
+    width: 0 !important;
+    flex: 0 0 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    /* stylelint-enable */
 }
 
 body.path-admin table.bizexaminer_api_credentials .form-label label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }

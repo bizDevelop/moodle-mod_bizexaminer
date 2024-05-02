@@ -18,7 +18,6 @@
  * A service for plugin settings.
  *
  * @package     mod_bizexaminer
- * @category    settings
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -50,7 +49,7 @@ class settings {
         'name', // Internal, for easier organisation.
         'keyowner',
         'keyorganisation',
-        'instance'
+        'instance',
     ];
 
     /**

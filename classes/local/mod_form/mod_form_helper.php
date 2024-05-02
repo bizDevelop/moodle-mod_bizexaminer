@@ -18,14 +18,12 @@
  * Mod form processor for creating/updating module instances
  *
  * @package     mod_bizexaminer
- * @category    mod_form
  * @copyright   2023 bizExaminer <moodle@bizexaminer.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_bizexaminer\local\mod_form;
 
-use coding_exception;
 use mod_bizexaminer\local\api\exam_modules;
 use mod_bizexaminer\local\api\remote_proctors;
 use mod_bizexaminer\bizexaminer;
@@ -33,7 +31,9 @@ use mod_bizexaminer\local\data_objects\exam;
 use mod_bizexaminer\local\data_objects\exam_feedback;
 use mod_bizexaminer\local\gradebook\grading;
 use mod_bizexaminer\util;
+use mod_bizexaminer_mod_form;
 use moodle_exception;
+use MoodleQuickForm;
 use stdClass;
 
 /**
@@ -98,14 +98,23 @@ class mod_form_helper {
             } else {
                 // All defined fields for all proctor types.
                 $allremoteproctorfields = remote_proctors::get_remote_proctor_setting_fields();
-                // The defined fields for the selected proctor type.
-                $remoteproctorfields = array_key_exists($exam->remoteproctortype, $allremoteproctorfields) ?
-                $allremoteproctorfields[$exam->remoteproctortype] : [];
-                // The values for the selected remote proctor.
+                // Only allow settings for the selected proctor (eg remove configs from previous selected proctors).
                 $values = array_key_exists($exam->remoteproctortype, $data->remote_proctor_options) ?
                 $data->remote_proctor_options[$exam->remoteproctortype] : [];
-
+                // Only allow the defined fields for the selected proctor.
+                $remoteproctorfields = array_key_exists($exam->remoteproctortype, $allremoteproctorfields) ?
+                $allremoteproctorfields[$exam->remoteproctortype] : [];
                 $allowedvalues = array_intersect_key($values, $remoteproctorfields);
+                // Check nested repeater values.
+                foreach ($remoteproctorfields as $field => $fieldconfig) {
+                    if (!array_key_exists($field, $allowedvalues)) {
+                        continue;
+                    }
+                    if ($fieldconfig['type'] === 'repeater') {
+                        $allowedvalues[$field] = array_intersect_key($allowedvalues[$field], $fieldconfig['fields']);
+                    }
+                }
+
                 $exam->remoteproctoroptions = $allowedvalues;
             }
         } else {
@@ -247,6 +256,220 @@ class mod_form_helper {
             }
 
             $key++;
+        }
+    }
+
+    /**
+     * Build settings for all remote proctors according to config from mod_bizexaminer\local\api\remote_proctors
+     *
+     * Form and modform are required toa dd fields directly to form.
+     *
+     * @param mod_bizexaminer_mod_form $form
+     * @param MoodleQuickForm $mform
+     * @param null|exam $exam
+     * @return void
+     */
+    public function add_remote_proctor_fields(mod_bizexaminer_mod_form $form, MoodleQuickForm $mform, ?exam $exam = null) {
+        foreach (remote_proctors::get_remote_proctor_setting_fields() as $proctor => $proctorfields) {
+            foreach ($proctorfields as $fieldname => $proctorfield) {
+                $fieldprefix = "remote_proctor_options[{$proctor}]";
+                $element = $this->create_remote_proctoring_setting_field(
+                    $proctor, $fieldprefix, $fieldname, $proctorfield, $form, $mform, $exam);
+
+                if ($element) {
+                    $mform->addElement($element);
+                    $fullfieldname = "{$fieldprefix}[{$fieldname}]";
+                    $labelstringidentifier = "modform_{$proctor}_{$fieldname}";
+                    if (!empty($proctorfield['help_text'])) {
+                        $mform->addHelpButton($fullfieldname, $labelstringidentifier, 'mod_bizexaminer');
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a field from the field config of a remote proctor.
+     * Builds the field but does not directly add it to the mform (except for repeaters).
+     *
+     * Paramters are required to correctly build element and state of element
+     * especially for repeaters.
+     *
+     * @param string $proctor
+     * @param string $fieldprefix
+     * @param string $fieldname
+     * @param array $field
+     * @param mod_bizexaminer_mod_form $form
+     * @param MoodleQuickForm $mform
+     * @param null|exam $exam
+     * @return object|null The created element.
+     */
+    private function create_remote_proctoring_setting_field(
+        string $proctor, string $fieldprefix, string $fieldname, array $field,
+        mod_bizexaminer_mod_form $form, MoodleQuickForm $mform, ?exam $exam = null) {
+        $fullfieldname = "{$fieldprefix}[{$fieldname}]";
+        $labelstringidentifier = "modform_{$proctor}_{$fieldname}";
+        $element = null;
+        switch ($field['type']) {
+            case 'text':
+                $element = $mform->createElement(
+                    'text',
+                    $fullfieldname,
+                    get_string($labelstringidentifier, 'mod_bizexaminer'),
+                );
+                $mform->setType($fullfieldname, $field['sanitizetype'] ?? PARAM_NOTAGS);
+                break;
+            case 'multiselect';
+            case 'select':
+                $element = $mform->createElement(
+                    'select',
+                    $fullfieldname,
+                    get_string($labelstringidentifier, 'mod_bizexaminer'),
+                    $field['options']
+                );
+                if (isset($field['multiple']) && $field['multiple']) {
+                    $element->setMultiple(true);
+                }
+                break;
+            case 'repeater':
+                $repeatedfields = [];
+                $repeatedfieldoptions = [];
+                foreach ($field['fields'] as $subfieldname => $subfield) {
+                    $fullsubfieldname = "{$fullfieldname}[{$subfieldname}]";
+                    $repeatedelement = $this->create_remote_proctoring_setting_field(
+                        $proctor, $fullfieldname, $subfieldname, $subfield, $form, $mform, $exam);
+                    if ($repeatedelement) {
+                        $repeatedfields[] = $repeatedelement;
+                        $repeatedfieldoptions[$fullsubfieldname] = [
+                            'type' => $repeatedfield['sanitizetype'] ?? PARAM_TEXT,
+                        ];
+                    }
+                }
+
+                // For helper fields outside the repeater, use a dash-separated string here.
+                // Also important for delete button: Delete button name is built different by moodle
+                // (by appending -hidden to it) so the default array form will not work.
+                $helperfieldsname = str_replace(['[', ']'], '_', $fullfieldname);
+
+                // To hide a static element, it needs to be in a group,
+                // see https://tracker.moodle.org/browse/MDL-66251 .
+                // Create a label element, which is shown with the default 0 elements and add-button.
+                // A static inside group looks funky,therefore just use an empty group with a label.
+                // Do not put repeater fields inside a group, because group is always displayed inline.
+                $mform->addGroup([], $helperfieldsname, get_string($labelstringidentifier, 'mod_bizexaminer'), '', false);
+
+                $deletebuttonname = $helperfieldsname . '_delete';
+                $repeatedfields[] = $mform->createElement(
+                    'submit', $deletebuttonname, $field['deletelabel'] ?? get_string('delete'), [], false);
+
+                $repeatscount = 0;
+                if (isset($exam->remoteproctoroptions[$proctor][$fieldname])) {
+                    $firstrepeatedfield = array_key_first($exam->remoteproctoroptions[$proctor][$fieldname]);
+                    if ($firstrepeatedfield) {
+                        $repeatscount = count($exam->remoteproctoroptions[$proctor][$fieldname][$firstrepeatedfield]);
+                    }
+                }
+
+                $form->repeat_elements(
+                    $repeatedfields,
+                    $repeatscount,
+                    $repeatedfieldoptions,
+                    $fullfieldname . '[_repeats]',
+                    $fullfieldname . '[_add_fields]',
+                    1,
+                    $field['addlabel'],
+                    true, // Do not close header.
+                    $deletebuttonname
+                );
+                break;
+            case 'switch':
+                $element = $mform->createElement(
+                    'selectyesno',
+                    $fullfieldname, // Get's appended to array of group name $group[$field].
+                    get_string($labelstringidentifier, 'mod_bizexaminer'),
+                );
+        }
+
+        return $element;
+    }
+
+    /**
+     * Hides all the remote proctoring setting fields if no remote_proctor is selected, none aravailable
+     * or no api credentials are selected.
+     *
+     * Used in mod_form::definition_after_data which can change definitions after data has been read.
+     *
+     * @param MoodleQuickForm $mform
+     * @param null|array $remoteproctoroptions Null means none available (no api credentials,...) -> hide them
+     * @return void
+     */
+    public function hide_remote_proctoring_fields(MoodleQuickForm $mform, array $remoteproctoroptions = []) {
+        // When selected API credentials are here, get real proctor options
+        // and show/hide them depending on the selected proctor.
+        foreach (remote_proctors::get_remote_proctor_setting_fields() as $proctor => $proctorfields) {
+            // Hide proctor fields if no remote proctor is selected
+            // or if any other remote proctors than those beloning to this proctor type
+            // are selected.
+            // Build select options per proctor for remote proctor settings to depend upon
+            // because the syntax does not allow wildcard checking.
+            $otherproctoroptions = array_reduce(array_keys($remoteproctoroptions), function($otheroptions, $option) use ($proctor) {
+                $optionproctor = explode('_-_', $option)[0];
+                if ($optionproctor && $optionproctor !== $proctor) {
+                    $otheroptions[] = $option;
+                }
+                return $otheroptions;
+            }, [0, '']); // 0 for default value
+
+            foreach ($proctorfields as $fieldname => $proctorfield) {
+                $fullfieldname = "remote_proctor_options[{$proctor}][{$fieldname}]";
+
+                // Store function in an anonymous function to reuse for both if-cases below.
+                $hidefield = function($mform, $hidefieldname) use ($remoteproctoroptions, $otherproctoroptions) {
+                    // If no remote proctors -> no remote proctor select -> remove all fields.
+                    if (empty($remoteproctoroptions) || !$mform->elementExists('remote_proctor')) {
+                        if ($mform->elementExists($hidefieldname)) {
+                            $mform->removeElement($hidefieldname);
+                        }
+                        return;
+                    }
+
+                    $mform->hideIf(
+                        $hidefieldname,
+                        'remote_proctor',
+                        'in',
+                        $otherproctoroptions
+                    );
+                };
+
+                // Repeaters need special handling for removing/hiding
+                // because their field names have an additional level with indexes.
+                if ($proctorfield['type'] === 'repeater') {
+                    // Hide/remove all fields inside the repeater.
+                    $repeatscountfield = $mform->getElement($fullfieldname . '[_repeats]');
+                    $repeatscount = 1;
+                    if ($repeatscountfield && $repeatscountfield->getValue()) {
+                        $repeatscount = (int) $repeatscountfield->getValue();
+                    }
+
+                    $hidefield($mform, $fullfieldname . '[_add_fields]');
+
+                    // See comment in create_remote_proctoring_setting_field.
+                    $helperfieldsname = str_replace(['[', ']'], '_', $fullfieldname);
+                    $hidefield($mform, $helperfieldsname); // Hide repeater "label" group.
+
+                    $deletebuttonname = $helperfieldsname . '_delete';
+
+                    foreach ($proctorfield['fields'] as $repeatedfieldname => $repeatedfieldargs) {
+                        $repeatedfullfieldname = $fullfieldname . "[{$repeatedfieldname}]";
+                        for ($i = 0; $i < $repeatscount; $i++) {
+                            $hidefield($mform, $repeatedfullfieldname . "[{$i}]");
+                            $hidefield($mform, $deletebuttonname . "[{$i}]");
+                        }
+                    }
+                } else {
+                    $hidefield($mform, $fullfieldname);
+                }
+            }
         }
     }
 }

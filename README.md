@@ -26,7 +26,7 @@ With our Moodle plugin you can use all of the LMS features and handle exams in b
 
 - bizExaminer Exams are available as an **activity module** inside your Moodle courses.
 - Integrates with Moodles **grading**, and supports multiple grade methods (highest, first, last attempt, average).
-- **Remote Proctoring:** bizExaminer supports Examity, Constructor (Examus), ProctorExam and Proctorio for monitoring remote exams.
+- **Remote Proctoring:** bizExaminer supports Examity, Constructor (Examus), ProctorExam, Proctorio and Meazure Learning (ProctorU) for monitoring remote exams.
 - **Results** are directly stored in Moodle and therefore available to show in attempt details.
 - Use **bizExaminer certificates** which are shown to users when they pass the exams.
 - Configure **restrictions** for exams like:
@@ -121,6 +121,15 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Changelog ##
+
+### 1.4.0 (2024-05-02) ###
+- Compatibility: Support Moodle 4.4 and PHP 8.3
+- Enhancement: Add Meazure Learning (ProctorU) remote proctor
+- Enhancement: Add Examity v5 Support
+- Enhancement: Redo Remote Proctor UI to allow for more complex settings. No breaking changes - all existing remote proctor options should work as they were.
+- Enhancement: Add clearer error messages for users and for logging
+- Enhancement: Update translation strings to use sentence case and add more German translations
+- Dev: Add moodle-plugin-ci for code-checks. Check [GitHub Repository](https://github.com/bizDevelop/moodle-mod_bizexaminer/actions) for linting status of all our releases.
 
 ### 1.3.0 (2024-03-20) ###
 - Tweak: "Test credentials" button is now disabled when you have unsaved changes in the API credentials settings, to prevent you from discarding those changes
