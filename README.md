@@ -122,6 +122,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Changelog ##
 
+### 1.5.0 (2024-10-21) ###
+- Compatibility: Support Moodle 4.5
+- Compatibility: End support for Moodle 4.2
+- Translations: Change course reset form labels in accordance with Moodle 4.5 guidelines
+- Fix: Fix exception when no remote proctors are configured for an account
+
 ### 1.4.0 (2024-05-02) ###
 - Compatibility: Support Moodle 4.4 and PHP 8.3
 - Enhancement: Add Meazure Learning (ProctorU) remote proctor

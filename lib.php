@@ -228,6 +228,7 @@ function bizexaminer_extend_settings_navigation(settings_navigation $settings, n
  */
 function bizexaminer_reset_course_form_definition($mform) {
     $mform->addElement('header', 'bizexaminerheader', get_string('pluginname', 'mod_bizexaminer'));
+    $mform->addElement('static', 'bizexaminerdelete', get_string('delete'));
     $mform->addElement('advcheckbox', 'reset_exam_attempts',
             get_string('resetform_remove_attempts', 'mod_bizexaminer'));
 }

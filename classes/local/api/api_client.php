@@ -426,30 +426,32 @@ class api_client {
             }
         }
 
-        switch ($apiresult->get_response_code()) {
-            case api_result::STATUS_UNAUTHORIZED:
-                $error = new api_error(
-                    'bizexaminer-api-not-allowed',
-                    get_string('error_api_keys', 'mod_bizexaminer'),
-                    ['result' => $apiresult]
-                );
-                break;
-            case api_result::STATUS_NOT_FOUND:
-                $error = new api_error(
-                    'bizexaminer-api-not-found',
-                    get_string('error_api_url', 'mod_bizexaminer'),
-                    ['result' => $apiresult]
-                );
-                break;
-            case api_result::STATUS_BAD_REQUEST:
-            case api_result::STATUS_ERROR:
-            default:
-                $error = new api_error(
-                    'bizexaminer-api-error',
-                    get_string('error_api_error', 'mod_bizexaminer'),
-                    ['result' => $apiresult]
-                );
-                break;
+        if (!$error) {
+            switch ($apiresult->get_response_code()) {
+                case api_result::STATUS_UNAUTHORIZED:
+                    $error = new api_error(
+                        'bizexaminer-api-not-allowed',
+                        get_string('error_api_keys', 'mod_bizexaminer'),
+                        ['result' => $apiresult]
+                    );
+                    break;
+                case api_result::STATUS_NOT_FOUND:
+                    $error = new api_error(
+                        'bizexaminer-api-not-found',
+                        get_string('error_api_url', 'mod_bizexaminer'),
+                        ['result' => $apiresult]
+                    );
+                    break;
+                case api_result::STATUS_BAD_REQUEST:
+                case api_result::STATUS_ERROR:
+                default:
+                    $error = new api_error(
+                        'bizexaminer-api-error',
+                        get_string('error_api_error', 'mod_bizexaminer'),
+                        ['result' => $apiresult]
+                    );
+                    break;
+            }
         }
 
         if ($error) {

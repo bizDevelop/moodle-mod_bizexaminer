@@ -151,10 +151,10 @@ class remote_proctor_select extends \MoodleQuickForm_select {
     /**
      * Parse a combined value of remote proctor type and id.
      *
-     * @param string $value
+     * @param string|null $value
      * @return null|string[]
      */
-    public static function parse_remote_proctor_value(string $value = '') {
+    public static function parse_remote_proctor_value(?string $value = '') {
         return empty($value) || !str_contains($value, '_-_') ? null : explode('_-_', $value);
     }
 
