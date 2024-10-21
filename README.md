@@ -122,6 +122,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Changelog ##
 
+### 1.5.1 (2024-10-21) ###
+- Dev: Fix GitHub Actions for v1.5.0 with Moodle 4.5 to only run on PHP 8.1+
+
 ### 1.5.0 (2024-10-21) ###
 - Compatibility: Support Moodle 4.5
 - Compatibility: End support for Moodle 4.2

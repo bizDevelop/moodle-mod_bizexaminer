@@ -34,6 +34,9 @@ jobs:
         moodle-branch: ['MOODLE_403_STABLE', 'MOODLE_404_STABLE', 'MOODLE_405_STABLE']
         database: [pgsql, mariadb]
         exclude:
+          # Moodle 4.5 supports only PHP 8.1+
+          - php: '8.0'
+            moodle-branch: 'MOODLE_405_STABLE'
           # Moodle 4.4 supports only PHP 8.1+
           - php: '8.0'
             moodle-branch: 'MOODLE_404_STABLE'
